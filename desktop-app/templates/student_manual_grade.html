@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Enter Your Grade{% endblock %}
+
+{% block content %}
+<div class="page-sm">
+  <div class="card" style="margin-top:32px">
+    <div class="card-header">
+      <h1>⚠️ Grade Could Not Be Extracted</h1>
+      <p>Please enter your overall average grade manually to continue.</p>
+    </div>
+    <div class="card-body">
+
+      <div class="alert alert-error">
+        We were unable to automatically extract your grade from the uploaded transcript.
+        This can happen if the transcript is scanned, image-based, or uses an unusual format.
+      </div>
+
+      <div class="alert alert-info" style="margin-top:12px">
+        Please enter your <strong>overall average grade</strong> as a percentage (e.g. 85.5).
+        You can find this on your transcript — it may be labelled as
+        "Overall Average", "Cumulative GPA", "Weighted Average", or similar.
+      </div>
+
+      <form method="POST" action="/check/manual-grade">
+        <!-- Hidden fields to carry forward the session data -->
+        <input type="hidden" name="student_number"  value="{{ student_number }}">
+        <input type="hidden" name="trans_fname"      value="{{ trans_fname }}">
+        <input type="hidden" name="letter_fname"     value="{{ letter_fname }}">
+
+        <div class="form-group" style="margin-top:20px">
+          <label>Overall Average Grade (%) *</label>
+          <input class="form-control" name="manual_grade"
+                 placeholder="e.g. 85.5"
+                 style="font-size:1.2rem;padding:12px"
+                 required autofocus>
+          <p class="hint">Enter a number between 0 and 100.</p>
+        </div>
+
+        <button class="btn btn-primary" type="submit"
+                style="width:100%;padding:12px;font-size:1rem;margin-top:8px">
+          Submit Grade & Check Eligibility →
+        </button>
+
+      </form>
+
+      <div style="margin-top:16px;text-align:center">
+        <a href="/" style="font-size:.85rem;color:var(--grey)">← Start over and re-upload</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

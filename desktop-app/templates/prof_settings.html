@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}">Dashboard</a>
+    <a href="/prof/{{ token }}/import">Import Roster</a>
+    <a href="/prof/{{ token }}/roster">Roster</a>
+    <a href="/prof/{{ token }}/eligible">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings" class="active">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="page">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat=='success' else 'error' }}"
+           style="margin-top:16px">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px">
+
+    <!-- LEFT: Thresholds -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <h1>⚙️ Eligibility Thresholds</h1>
+        <p>Changes take effect immediately for all subsequent checks.</p>
+      </div>
+      <div class="card-body">
+
+        {% if msg %}
+        <div class="alert {{ 'alert-success' if msg_type != 'error' else 'alert-error' }}">
+          {{ msg | safe }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+          <div class="form-group">
+            <label>Minimum Overall Grade % (m)</label>
+            <div style="display:flex;align-items:center;gap:14px">
+              <input type="range" name="min_grade_range" id="gr"
+                     min="50" max="100" step="0.5" value="{{ min_grade }}"
+                     oninput="document.getElementById('gv').value=parseFloat(this.value).toFixed(1)"
+                     style="flex:1">
+              <input type="number" name="min_grade" id="gv"
+                     min="50" max="100" step="0.5" value="{{ min_grade }}"
+                     oninput="document.getElementById('gr').value=this.value"
+                     class="form-control" style="width:90px">
+              <span style="color:var(--grey)">%</span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:20px">
+            <label>Minimum Attendance % (n)</label>
+            <div style="display:flex;align-items:center;gap:14px">
+              <input type="range" name="min_att_range" id="ar"
+                     min="50" max="100" step="0.5" value="{{ min_att }}"
+                     oninput="document.getElementById('av').value=parseFloat(this.value).toFixed(1)"
+                     style="flex:1">
+              <input type="number" name="min_att" id="av"
+                     min="50" max="100" step="0.5" value="{{ min_att }}"
+                     oninput="document.getElementById('ar').value=this.value"
+                     class="form-control" style="width:90px">
+              <span style="color:var(--grey)">%</span>
+            </div>
+          </div>
+
+          <hr>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" type="submit" name="action" value="save">
+              💾 Save Thresholds
+            </button>
+            <button class="btn btn-danger" type="submit" name="action" value="save_and_recheck"
+                    onclick="return confirm('Save thresholds and remove any pending eligible students who no longer qualify?\n\nStudents with completed references will not be affected.')">
+              💾 Save & Remove Non-Eligible
+            </button>
+          </div>
+        </form>
+
+        <div class="alert alert-info" style="margin-top:20px">
+          <strong>Your secret professor URL:</strong><br>
+          <code style="font-size:.78rem;word-break:break-all">
+            {{ request.host_url }}prof/{{ token }}
+          </code><br>
+          <span style="font-size:.75rem;color:var(--grey)">
+            Bookmark this — never share with students.
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Email -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header">
+        <h1>📧 Email Notifications</h1>
+        <p>Receive an email whenever a student submits their documents.</p>
+      </div>
+      <div class="card-body">
+
+        <div class="alert alert-info" style="margin-bottom:20px;font-size:.84rem">
+          Enter your email address below to receive a notification whenever a student submits their documents.
+        </div>
+
+        <form method="POST" action="/prof/{{ token }}/settings/email">
+          <div class="form-group">
+            <label>Notification Email *</label>
+            <input class="form-control" name="notify_email" type="email"
+                   placeholder="e.g. prof@ubc.ca"
+                   value="{{ notify_email or '' }}">
+            <p class="hint">This can be any email — Gmail, UBC, Outlook, etc.</p>
+          </div>
+          <input type="hidden" name="brevo_api_key" value="">
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" type="submit">💾 Save Email</button>
+          </div>
+        </form>
+
+        <form method="POST" action="/prof/{{ token }}/settings/test-email"
+              style="margin-top:12px">
+          <input type="hidden" name="notify_email"  value="{{ notify_email or '' }}">
+          <input type="hidden" name="brevo_api_key" value="{{ brevo_api_key or '' }}">
+          <button class="btn btn-outline" type="submit">📤 Send Test Email</button>
+        </form>
+
+        {% if not notify_email %}
+        <div class="alert alert-error" style="margin-top:14px;font-size:.83rem">
+          No email configured — notifications are currently disabled.
+        </div>
+        {% else %}
+        <div class="alert alert-success" style="margin-top:14px;font-size:.83rem">
+          ✅ Notifications will be sent to <strong>{{ notify_email }}</strong>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

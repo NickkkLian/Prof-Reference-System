@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Eligible Students{% endblock %}
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}">Dashboard</a>
+    <a href="/prof/{{ token }}/import">Import Roster</a>
+    <a href="/prof/{{ token }}/roster">Roster</a>
+    <a href="/prof/{{ token }}/eligible" class="active">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+.done-row { opacity: 0.7; background: #f0fdf4 !important; }
+[data-theme="dark"] .done-row { background: #0d1f0d !important; }
+.done-row td { text-decoration: none; color: var(--text) !important; }
+.check-form button {
+  width: 22px; height: 22px; border-radius: 4px; border: 2px solid #d1d5db;
+  background: #fff; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; padding: 0; transition: all .15s;
+}
+.check-form button:hover { border-color: var(--green); background: #f0fdf4; }
+.check-form button.checked { background: var(--green); border-color: var(--green); color: #fff; }
+.section-divider {
+  margin: 32px 0 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-divider span {
+  font-size: .88rem; font-weight: 700; color: var(--grey);
+  text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat=='success' else 'error' }}"
+           style="margin-top:16px">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% set pending = rows | selectattr('reference_done', 'equalto', 0) | list %}
+  {% set done    = rows | selectattr('reference_done', 'ne', 0) | list %}
+
+  <!-- ── Pending section ────────────────────────────────────── -->
+  <div class="card" style="margin-top:24px">
+    <div class="card-header">
+      <h1>✅ Eligible Students</h1>
+      <p>{{ pending | length }} pending · {{ done | length }} reference completed</p>
+    </div>
+    <div class="card-body">
+
+      {% if rows %}
+      <div class="alert alert-info" style="margin-bottom:16px;font-size:.83rem">
+        Click the <strong>checkbox</strong> next to a student once you have written their reference —
+        they will move to the Completed section below.
+      </div>
+      {% endif %}
+
+      {% if pending %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">Done</th>
+              <th>Student #</th><th>Name</th><th>Grade</th><th>Grade Source</th>
+              <th>Eligible Enrolments</th><th>Attendance Rates</th>
+              <th>Letter</th><th>Checked At</th><th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in pending %}
+            <tr>
+              <!-- Checkbox -->
+              <td>
+                <form class="check-form" method="POST"
+                      action="/prof/{{ token }}/eligible/toggle-done/{{ r.student_number }}">
+                  <button type="submit" title="Mark reference as done">☐</button>
+                </form>
+              </td>
+              <td>{{ r.student_number }}</td>
+              <td><strong>{{ r.student_name }}</strong></td>
+              <td>
+                <span style="color:var(--green);font-weight:600">
+                  {{ '%.1f' % r.overall_grade_pct if r.overall_grade_pct else '—' }}%
+                  {% if r.grade_source == 'manual' %}
+                    <span title="Manually entered — pending verification"
+                          style="color:#f59e0b"> ⚠️</span>
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <span class="badge {{ 'badge-red' if r.grade_source == 'manual' else 'badge-blue' }}">
+                  {{ r.grade_source or '—' }}{% if r.grade_source == 'manual' %} ⚠️{% endif %}
+                </span>
+              </td>
+              <td style="font-size:.75em;color:var(--grey);max-width:220px">
+                {% if r.eligible_identifiers %}
+                  {% for part in r.eligible_identifiers.split(';') %}
+                    {% set iid = part.strip() %}
+                    {% if iid %}{{ iid }}<br>{% endif %}
+                  {% endfor %}
+                {% else %}—{% endif %}
+              </td>
+              <td style="font-size:.75em;color:var(--grey);max-width:120px">
+                {% if r.attendance_rates %}
+                  {% for entry in r.attendance_rates.split(';') %}
+                    {% set entry = entry.strip() %}
+                    {% if entry and ':' in entry %}
+                      <span style="color:var(--green);font-weight:600">
+                        {{ entry.rsplit(':', 1)[1] }}
+                      </span><br>
+                    {% endif %}
+                  {% endfor %}
+                {% else %}—{% endif %}
+              </td>
+              <td>
+                {% if r.letter_file %}
+                  <a href="/prof/{{ token }}/letters/download/{{ r.letter_file }}"
+                     class="btn btn-outline btn-sm">⬇</a>
+                {% else %}—{% endif %}
+              </td>
+              <td style="color:var(--grey);font-size:.8em;white-space:nowrap">
+                {{ r.checked_at }}
+              </td>
+              <td>
+                <form method="POST"
+                      action="/prof/{{ token }}/eligible/delete/{{ r.student_number }}"
+                      onsubmit="return confirm('Remove {{ r.student_name }} from the eligible list?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="color:var(--grey)">
+        {% if done %}All eligible students have had their reference completed. 🎉
+        {% else %}No eligible students yet. They appear here automatically after passing all 3 criteria.
+        {% endif %}
+      </p>
+      {% endif %}
+
+      <!-- ── Completed section ─────────────────────────────── -->
+      {% if done %}
+      <div class="section-divider"><span>Reference Completed ({{ done | length }})</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px">Undo</th>
+              <th>Student #</th><th>Name</th><th>Grade</th>
+              <th>Completed At</th><th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in done %}
+            <tr class="done-row">
+              <!-- Uncheck button -->
+              <td>
+                <form class="check-form" method="POST"
+                      action="/prof/{{ token }}/eligible/toggle-done/{{ r.student_number }}">
+                  <button type="submit" class="checked" title="Mark as not done">✔</button>
+                </form>
+              </td>
+              <td>{{ r.student_number }}</td>
+              <td><strong>{{ r.student_name }}</strong></td>
+              <td>
+                <span style="color:var(--green);font-weight:600">
+                  {{ '%.1f' % r.overall_grade_pct if r.overall_grade_pct else '—' }}%
+                </span>
+              </td>
+              <td style="color:var(--grey);font-size:.82em;white-space:nowrap">
+                {{ r.reference_done_at or '—' }}
+              </td>
+              <td>
+                <form method="POST"
+                      action="/prof/{{ token }}/eligible/delete/{{ r.student_number }}"
+                      onsubmit="return confirm('Remove {{ r.student_name }} from the eligible list?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      {% if rows %}
+      <div class="alert alert-info" style="margin-top:16px;font-size:.83rem">
+        ⚠️ <strong>Orange warning</strong> next to a grade means it was entered manually
+        by the student — please verify against their uploaded transcript.
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

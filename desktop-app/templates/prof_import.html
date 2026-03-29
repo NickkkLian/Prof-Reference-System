@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Import Roster{% endblock %}
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}">Dashboard</a>
+    <a href="/prof/{{ token }}/import" class="active">Import Roster</a>
+    <a href="/prof/{{ token }}/roster">Roster</a>
+    <a href="/prof/{{ token }}/eligible">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="page" style="max-width:760px">
+  <div class="card" style="margin-top:24px">
+    <div class="card-header">
+      <h1>📂 Import Roster File</h1>
+      <p>Enter the course details and upload the corresponding student roster.</p>
+    </div>
+    <div class="card-body">
+
+      <form method="POST" enctype="multipart/form-data">
+
+        <!-- Course metadata -->
+        <div class="alert alert-info" style="margin-bottom:20px">
+          Enter the course details below. Your Excel file only needs:
+          <strong>Student #, First Name, Last Name, %Abs, Grade</strong>.
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group">
+            <label>Course Code *</label>
+            <input class="form-control" name="course" required
+                   placeholder="e.g. Comm 436"
+                   value="{{ form_vals.get('course','') }}">
+          </div>
+          <div class="form-group">
+            <label>Section *</label>
+            <input class="form-control" name="section" required
+                   placeholder="e.g. 101 or BA1"
+                   value="{{ form_vals.get('section','') }}">
+          </div>
+          <div class="form-group">
+            <label>Year *</label>
+            <input class="form-control" name="year" required
+                   placeholder="e.g. 2025"
+                   value="{{ form_vals.get('year','') }}">
+          </div>
+          <div class="form-group">
+            <label>Term *</label>
+            <input class="form-control" name="term" required
+                   placeholder="e.g. W1, W2, S"
+                   value="{{ form_vals.get('term','') }}">
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- File upload -->
+        <div class="form-group">
+          <label>Roster Excel File (.xlsx) *</label>
+          <input class="form-control" type="file" name="roster_files"
+                 accept=".xlsx" required>
+          <p class="hint">
+            File must contain these columns (in any order):
+            <strong>Student #, First Name, Last Name, Abs</strong>
+            (or %Abs, Absence, Absence %).
+            Grade column is optional.
+          </p>
+        </div>
+
+        <button class="btn btn-primary" type="submit">▶ Import Now</button>
+
+      </form>
+
+      {% if results %}
+      <hr>
+      <h3 style="margin-bottom:12px;font-size:.95rem">Import Results</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Course Info</th>
+              <th>Records</th>
+              <th>New</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr>
+              <td>{{ r.file }}</td>
+              <td style="color:var(--grey);font-size:.85em">
+                {{ r.get('meta', '—') }}
+              </td>
+              <td>{{ r.total }}</td>
+              <td>{{ r.new }}</td>
+              <td>
+                {% if r.status == 'ok' %}
+                  <span class="badge badge-green">✔ OK</span>
+                {% else %}
+                  <span class="badge badge-red"
+                        style="white-space:normal;display:inline-block;max-width:300px">
+                    {{ r.status }}
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px">
+        <a href="/prof/{{ token }}/roster" class="btn btn-outline btn-sm">
+          View Full Roster →
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
