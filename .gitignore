@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Sensitive data
+data/professor_reference.db
+data/prof_token.txt
+data/email_settings.txt
+data/saved_thresholds.txt
+data/uploads/
+data/attendance_input/
