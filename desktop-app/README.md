@@ -11,7 +11,17 @@ python3 create_sample_data.py
 python3 launcher.py
 ```
 
-Browser opens automatically at `http://127.0.0.1:5001/prof/<your-token>`
+The app opens automatically in your browser at the **professor dashboard**.
+Both portals run simultaneously from the same app:
+
+| Portal | URL |
+|---|---|
+| Professor dashboard | `http://127.0.0.1:5001/prof/<your-token>` (opens automatically) |
+| Student portal | `http://127.0.0.1:5001` |
+
+The professor token is generated on first run and saved to `data/prof_token.txt`.
+Share the student portal URL with students — they access it from the same network,
+or via a tunneling tool like ngrok for remote access.
 
 ## Building the Desktop App
 
