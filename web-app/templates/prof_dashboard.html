@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Professor Dashboard{% endblock %}
+
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}" class="active">Dashboard</a>
+    <a href="/prof/{{ token }}/import">Import Roster</a>
+    <a href="/prof/{{ token }}/roster">Roster</a>
+    <a href="/prof/{{ token }}/eligible">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">{{ stats.total_enrolments }}</div>
+      <div class="stat-lbl">Total Enrolments</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">{{ stats.unique_students }}</div>
+      <div class="stat-lbl">Unique Students</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">{{ stats.courses | length }}</div>
+      <div class="stat-lbl">Courses</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" style="color:var(--green)">{{ eligible_count }}</div>
+      <div class="stat-lbl">Eligible Students</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header"><h1>Quick Actions</h1></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <a href="/prof/{{ token }}/import"   class="btn btn-outline">📂 Import New Roster File</a>
+        <a href="/prof/{{ token }}/eligible" class="btn btn-outline">📋 View Eligible Students</a>
+        <a href="/prof/{{ token }}/documents" class="btn btn-outline">📁 View Documents</a>
+        <a href="/prof/{{ token }}/settings" class="btn btn-outline">⚙️ Change Thresholds</a>
+      </div>
+    </div>
+
+    <!-- Check Student -->
+    <div class="card">
+      <div class="card-header">
+        <h1>Check Student Eligibility</h1>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/prof/{{ token }}">
+          <div class="form-group">
+            <label>Student Number</label>
+            <input class="form-control" name="student_number"
+                   placeholder="e.g. 583214" required>
+          </div>
+          <div class="form-group">
+            <label>Grade % Override (optional)</label>
+            <input class="form-control" name="manual_grade"
+                   placeholder="Leave blank to use DB grade">
+          </div>
+          <button class="btn btn-primary" type="submit">Check →</button>
+        </form>
+
+        {% if check_result %}
+        <hr>
+        <div class="verdict {{ 'verdict-pass' if check_result.eligible else 'verdict-fail' }}"
+             style="font-size:.95rem;padding:12px 16px;margin-bottom:12px">
+          {% if check_result.eligible %}🎉 ELIGIBLE{% else %}❌ NOT ELIGIBLE{% endif %}
+          — {{ check_result.student_name }} ({{ check_result.student_number }})
+        </div>
+        <table class="criteria" style="font-size:.82em">
+          <tbody>
+            <tr>
+              <td class="tick {{ 'tick-pass' if check_result.in_db else 'tick-fail' }}">
+                {{ '✔' if check_result.in_db else '✘' }}</td>
+              <td>Enrolled</td>
+              <td style="color:var(--grey)">
+                {{ check_result.identifiers | join(', ') if check_result.in_db else 'Not found' }}
+              </td>
+            </tr>
+            <tr>
+              <td class="tick {{ 'tick-pass' if check_result.grade_ok else 'tick-fail' }}">
+                {{ '✔' if check_result.grade_ok else '✘' }}</td>
+              <td>Grade ≥ {{ check_result.min_grade }}%</td>
+              <td style="color:var(--grey)">
+                {{ '%.1f' % check_result.grade if check_result.grade else 'N/A' }}%
+                ({{ check_result.grade_source }})
+              </td>
+            </tr>
+            <tr>
+              <td class="tick {{ 'tick-pass' if check_result.att_ok else 'tick-fail' }}">
+                {{ '✔' if check_result.att_ok else '✘' }}</td>
+              <td>Attendance ≥ {{ check_result.min_att }}%</td>
+              <td style="color:var(--grey)">
+                {% for iid, rate in check_result.att_results.items() %}
+                  {{ '✔' if rate and rate >= check_result.min_att else '✘' }}
+                  {{ iid }}: {{ '%.1f' % rate if rate else 'N/A' }}%<br>
+                {% endfor %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Courses -->
+  <div class="card">
+    <div class="card-header"><h1>Courses in Database</h1></div>
+    <div class="card-body">
+      {% if stats.courses %}
+        {% for c in stats.courses %}
+          <span class="badge badge-blue" style="margin:3px">{{ c }}</span>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--grey)">No courses yet — import a roster file to get started.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if recent %}
+  <div class="card">
+    <div class="card-header"><h1>Recently Eligible Students</h1></div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student #</th><th>Name</th><th>Grade</th><th>Checked At</th></tr></thead>
+          <tbody>
+            {% for row in recent %}
+            <tr>
+              <td>{{ row.student_number }}</td>
+              <td>{{ row.student_name }}</td>
+              <td>{{ '%.1f' % row.overall_grade_pct if row.overall_grade_pct else '—' }}%</td>
+              <td style="color:var(--grey)">{{ row.checked_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px">
+        <a href="/prof/{{ token }}/eligible" class="btn btn-outline btn-sm">View All →</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Storage -->
+  <div class="card">
+    <div class="card-header"><h1>💾 Storage Usage</h1></div>
+    <div class="card-body">
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:.85rem">
+          <span>Used: <strong>{{ storage.total }}</strong></span>
+          <span style="color:var(--grey)">Limit: 512 MB</span>
+        </div>
+        <div style="background:#e5e7eb;border-radius:20px;height:14px;overflow:hidden">
+          <div style="height:100%;border-radius:20px;width:{{ [storage.pct, 100] | min }}%;
+               background:{{ '#dc2626' if storage.pct > 80 else '#f59e0b' if storage.pct > 50 else '#16a34a' }};
+               transition:width .3s"></div>
+        </div>
+        <div style="font-size:.78rem;color:var(--grey);margin-top:4px">
+          {{ storage.pct }}% of 512 MB used
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px">
+        {% for label, key, icon in [
+            ('Database','db','🗄️'),('Transcripts','transcripts','📄'),
+            ('Letters','letters','📝'),('Rosters','rosters','📊')] %}
+        <div style="background:var(--row-even);border-radius:8px;padding:12px;text-align:center;
+                    border:1px solid var(--border)">
+          <div style="font-size:1.4em">{{ icon }}</div>
+          <div style="font-size:.88rem;font-weight:600;color:var(--navy);margin-top:4px">
+            {{ storage[key] }}</div>
+          <div style="font-size:.75rem;color:var(--grey)">{{ label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Eligibility Result{% endblock %}
+{% block content %}
+<div class="page-sm">
+  <div class="card" style="margin-top:32px">
+    <div class="card-header">
+      <h1>📋 Eligibility Result</h1>
+      <p>{{ r.student_name }} ({{ r.student_number }}) — checked {{ checked_at }}</p>
+    </div>
+    <div class="card-body">
+
+      {% if grade_note %}
+      <div class="alert alert-info">{{ grade_note }}</div>
+      {% endif %}
+
+      <div class="verdict {{ 'verdict-pass' if r.eligible else 'verdict-fail' }}">
+        {% if r.eligible %}
+          🎉 You are <strong>ELIGIBLE</strong> for a reference letter.
+        {% else %}
+          ❌ You are <strong>NOT ELIGIBLE</strong> for a reference letter at this time.
+        {% endif %}
+      </div>
+
+      <div class="table-wrap">
+        <table class="criteria">
+          <thead><tr><th>Status</th><th>Criterion</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="tick {{ 'tick-pass' if r.in_db else 'tick-fail' }}">
+                {{ '✔' if r.in_db else '✘' }}</span></td>
+              <td>Enrolled in course database</td>
+              <td style="color:var(--grey);font-size:.83em">
+                {% if r.in_db %}{{ r.identifiers | join('<br>')|safe }}
+                {% else %}Student number not found{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td><span class="tick {{ 'tick-pass' if r.grade_ok else 'tick-fail' }}">
+                {{ '✔' if r.grade_ok else '✘' }}</span></td>
+              <td>Overall grade ≥ {{ r.min_grade }}%</td>
+              <td style="color:var(--grey);font-size:.83em">
+                {{ '%.1f' % r.grade if r.grade is not none else 'Not available' }}%
+                {% if r.grade_source %}<span style="color:#aaa">({{ r.grade_source }})</span>{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td><span class="tick {{ 'tick-pass' if r.att_ok else 'tick-fail' }}">
+                {{ '✔' if r.att_ok else '✘' }}</span></td>
+              <td>Attendance ≥ {{ r.min_att }}% (ALL enrolments)</td>
+              <td style="color:var(--grey);font-size:.83em">
+                {% for iid, rate in r.att_results.items() %}
+                  <span class="{{ 'tick-pass' if rate and rate >= r.min_att else 'tick-fail' }}">
+                    {{ '✔' if rate and rate >= r.min_att else '✘' }}</span>
+                  {{ iid }}: {{ '%.1f' % rate if rate is not none else 'N/A' }}%<br>
+                {% endfor %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {% if not r.eligible %}
+      <div class="alert alert-error" style="margin-top:16px">
+        If you believe this result is incorrect, please contact your professor directly.
+      </div>
+      {% endif %}
+
+
+
+    </div>
+  </div>
+</div>
+{% endblock %}

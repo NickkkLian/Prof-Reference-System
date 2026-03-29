@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Manage Roster Files{% endblock %}
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}">Dashboard</a>
+    <a href="/prof/{{ token }}/import">Import Roster</a>
+    <a href="/prof/{{ token }}/roster">Roster</a>
+    <a href="/prof/{{ token }}/eligible">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files" class="active">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="page">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ 'success' if cat=='success' else 'error' }}"
+           style="margin-top:16px">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card" style="margin-top:24px">
+    <div class="card-header">
+      <h1>📂 Manage Roster Files</h1>
+      <p>View, import, or delete attendance roster files. Deleting a file also removes its records from the database.</p>
+    </div>
+    <div class="card-body">
+
+      <div class="alert alert-info" style="margin-bottom:20px">
+        ⚠️ <strong>Deleting a file is permanent.</strong> All enrolments from that file
+        will be removed from the database. Students with no remaining enrolments
+        will also be removed from the eligible list.
+      </div>
+
+      {% if disk_files %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>File Size</th>
+              <th>Uploaded</th>
+              <th>Enrolments in DB</th>
+              <th>Students in DB</th>
+              <th>Last Imported</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in disk_files %}
+            {% set db_info = db_files.get(f.name) %}
+            <tr>
+              <td><strong>{{ f.name }}</strong></td>
+              <td style="color:var(--grey)">{{ f.size }}</td>
+              <td style="color:var(--grey)">{{ f.modified }}</td>
+              <td>
+                {% if db_info %}
+                  <span class="badge badge-blue">{{ db_info.enrolment_count }}</span>
+                {% else %}
+                  <span style="color:var(--grey);font-size:.82em">Not imported yet</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if db_info %}
+                  {{ db_info.student_count }}
+                {% else %}—{% endif %}
+              </td>
+              <td style="color:var(--grey);font-size:.82em">
+                {% if db_info %}{{ db_info.last_updated }}{% else %}—{% endif %}
+              </td>
+              <td>
+                <div style="display:flex;gap:8px;align-items:center">
+                  {% if not db_info %}
+                  <a href="/prof/{{ token }}/import"
+                     class="btn btn-primary btn-sm">Import</a>
+                  {% endif %}
+                  <form method="POST"
+                        action="/prof/{{ token }}/files/delete/{{ f.name }}"
+                        onsubmit="return confirm('Delete {{ f.name }}?\n\nThis will remove all its enrolments from the database and any students with no remaining enrolments from the eligible list.\n\nThis cannot be undone.')">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% else %}
+      <p style="color:var(--grey)">No roster files found.</p>
+      <a href="/prof/{{ token }}/import"
+         class="btn btn-primary btn-sm" style="margin-top:12px">
+        Import a Roster File →
+      </a>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- DB-only records (imported but file deleted externally) -->
+  {% set db_only = db_files.keys() | reject('in', disk_files | map(attribute='name') | list) | list %}
+  {% if db_only %}
+  <div class="card">
+    <div class="card-header">
+      <h1>⚠️ Database Records Without Files</h1>
+      <p>These files were imported but the original .xlsx is no longer on disk.</p>
+    </div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Source File</th><th>Enrolments</th><th>Students</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for fname in db_only %}
+            {% set info = db_files[fname] %}
+            <tr>
+              <td>{{ fname }}</td>
+              <td><span class="badge badge-blue">{{ info.enrolment_count }}</span></td>
+              <td>{{ info.student_count }}</td>
+              <td>
+                <form method="POST"
+                      action="/prof/{{ token }}/files/delete/{{ fname }}"
+                      onsubmit="return confirm('Remove all database records for {{ fname }}?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑 Remove from DB</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

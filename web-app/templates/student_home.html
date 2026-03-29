@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Reference Letter Eligibility Check{% endblock %}
+
+{% block content %}
+<div class="page-sm">
+  <div class="card" style="margin-top:32px">
+    <div class="card-header">
+      <h1>📋 Reference Letter Eligibility</h1>
+      <p>Upload your documents to check if you qualify for a reference letter.</p>
+    </div>
+    <div class="card-body">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+          <div class="alert alert-{{ 'error' if cat=='error' else 'info' }}">{{ msg }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <div class="alert alert-info">
+        Please upload both your official transcript and letter of interest to proceed.
+        Your grade will be extracted automatically from your transcript.
+      </div>
+
+      <form method="POST" action="/check" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label>Student Number *</label>
+          <input class="form-control" name="student_number"
+                 placeholder="e.g. 583214" required
+                 value="{{ prefill_sno or '' }}">
+        </div>
+
+        <div class="form-group">
+          <label>Official Transcript (PDF) *</label>
+          <input class="form-control" type="file" name="transcript"
+                 accept=".pdf" required>
+          <p class="hint">📌 Please name your file: <strong>STUDENTNUMBER_transcript.pdf</strong> (e.g. 583214_transcript.pdf)</p>
+        </div>
+
+        <div class="form-group">
+          <label>Letter of Interest (PDF) *</label>
+          <input class="form-control" type="file" name="letter"
+                 accept=".pdf" required>
+          <p class="hint">📌 Please name your file: <strong>STUDENTNUMBER_letter.pdf</strong> (e.g. 583214_letter.pdf)</p>
+        </div>
+
+        <div class="form-group" style="background:var(--light-blue);border:1px solid var(--border);
+             border-radius:8px;padding:14px 16px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400">
+            <input type="checkbox" name="consent" required
+                   style="margin-top:3px;flex-shrink:0;width:16px;height:16px">
+            <span style="font-size:.87rem;color:var(--text)">
+              I consent to my student information (student number, name, grade, and attendance)
+              being used solely for the purpose of determining eligibility for a reference letter.
+              This information will be stored securely and not shared with third parties. *
+            </span>
+          </label>
+        </div>
+
+        <button class="btn btn-primary" type="submit"
+                style="width:100%;padding:12px;font-size:1rem">
+          Check My Eligibility →
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Full Roster{% endblock %}
+{% block navbar %}
+<nav class="nav">
+  <span class="nav-brand">Prof Reference System</span>
+  <div class="nav-links">
+    <a href="/prof/{{ token }}">Dashboard</a>
+    <a href="/prof/{{ token }}/import">Import Roster</a>
+    <a href="/prof/{{ token }}/roster" class="active">Roster</a>
+    <a href="/prof/{{ token }}/eligible">Eligible</a>
+    <a href="/prof/{{ token }}/documents">Documents</a>
+    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
+    <a href="/prof/{{ token }}/settings">Settings</a>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="card" style="margin-top:24px">
+    <div class="card-header">
+      <h1>📊 Full Attendance Roster</h1>
+      <p>{{ rows | length }} enrolment records</p>
+    </div>
+    <div class="card-body">
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Student #</th><th>Name</th><th>Course</th>
+              <th>Section</th><th>Year</th><th>Term</th>
+              <th>Attendance %</th><th>Grade</th><th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <td>{{ r.student_number }}</td>
+              <td>{{ r.student_name }}</td>
+              <td>{{ r.course }}</td>
+              <td>{{ r.section }}</td>
+              <td>{{ r.year }}</td>
+              <td>{{ r.term }}</td>
+              <td>
+                {% if r.attendance_rate_pct %}
+                  {% set rate = r.attendance_rate_pct | float %}
+                  <span style="color:{{ 'var(--green)' if rate >= min_att else 'var(--red)' }};font-weight:600">
+                    {{ '%.1f' % rate }}%
+                  </span>
+                {% else %}—{% endif %}
+              </td>
+              <td>
+                {% if r.grade %}
+                  <span style="color:{{ 'var(--green)' if r.grade >= min_grade else 'var(--red)' }};font-weight:600">
+                    {{ '%.1f' % r.grade }}
+                  </span>
+                {% else %}—{% endif %}
+              </td>
+              <td style="color:var(--grey);font-size:.8em">{{ r.source_file or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p style="color:var(--grey)">No enrolments yet — import a roster file first.</p>
+      <a href="/prof/{{ token }}/import" class="btn btn-primary btn-sm" style="margin-top:12px">Import Roster →</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
