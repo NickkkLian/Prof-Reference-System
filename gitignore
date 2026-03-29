@@ -1,0 +1,32 @@
+# Data directory - contains sensitive student information
+data/professor_reference.db
+data/prof_token.txt
+data/email_settings.txt
+data/saved_thresholds.txt
+data/uploads/
+data/attendance_input/
+
+# Keep folder structure
+!data/.gitkeep
+!data/uploads/.gitkeep
+!data/attendance_input/.gitkeep
+
+# PyInstaller
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+
+# Python
+.env
+.venv
+venv/
+env/
+
+# Mac
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
