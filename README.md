@@ -1,3 +1,5 @@
+> **v1 - superseded.** Early version, kept as a public sample. The current build (desktop dashboard + watchdog + Render portal, portal-based eligibility form, server-side email) is maintained privately and is no longer reflected here.
+
 # Prof Reference System
 
 A full-stack web application that automates student eligibility screening for professor reference letters. Built with Python/Flask, SQLite, and a custom HTML/CSS frontend.
