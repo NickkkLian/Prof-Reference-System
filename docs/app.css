@@ -18,7 +18,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 ::selection{background:var(--selection-bg)}
 .topbar ::selection,.subnav ::selection,.honest ::selection{background:var(--on-band-2);color:var(--band)}
 :focus-visible{outline:var(--border-focus-width) solid var(--focus);outline-offset:2px;border-radius:var(--radius-xs)}
-.topbar :focus-visible,.subnav :focus-visible,.honest :focus-visible,.skip:focus-visible{outline-color:var(--on-band)}
+.topbar :focus-visible,.subnav :focus-visible,.honest :focus-visible,.plate :focus-visible,.skip:focus-visible{outline-color:var(--on-band)}
 button{font:inherit;color:inherit}
 a{color:var(--accent-text);text-underline-offset:.18em;text-decoration-thickness:from-font}
 code,kbd,.mono,.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums lining-nums}
@@ -171,13 +171,14 @@ table.data th.num{text-align:right}
   padding:var(--space-8) var(--gutter)}
 .honest .inner{max-width:var(--content-max);margin:0 auto;display:grid;gap:var(--space-5)}
 @media (min-width:768px){.honest .inner{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.honest dt{font-size:var(--text-2xs);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--on-band-3);margin-bottom:var(--space-2)}
+.honest dt{font-family:var(--font-sans);font-size:var(--text-2xs);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-caps);
+  text-transform:uppercase;color:var(--on-band);margin-bottom:var(--space-2)}
 .honest dd{margin:0;line-height:var(--leading-relaxed);max-width:var(--measure);font-size:var(--text-sm)}
 .honest a,.honest code{color:var(--on-band)}
 .honest a{text-decoration-color:var(--band-line)}
 
 @media (max-width:767px){
-  .topbar .brand span{display:none}
+  .topbar .brand span,.topbar .gh,.topbar #theme{display:none}   /* light/dark is in the Settings dialog */
   .topbar .pill .long{display:none}
   .topbar .brand b{font-size:var(--text-lg)}
   main{padding-top:var(--space-6)}

@@ -19,7 +19,7 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="brand" href="{{ url_for('prof_dashboard', token=token) if token else url_for('student_home') }}" aria-label="{{ app_name }} home">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="15" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="14" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
     <b>{{ app_name }}</b><span>{% block tagline %}Reference-letter eligibility for one course — the roster stays on the professor's machine.{% endblock %}</span>
   </a>
   {% if token %}<span class="pill" title="You are on the professor's side of the app; the address carries the token that opens it.">Professor<span class="long"> view</span></span>{% else %}<span class="spacer"></span>{% endif %}

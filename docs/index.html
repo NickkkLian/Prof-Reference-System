@@ -16,12 +16,14 @@
 <link rel="stylesheet" href="app.css">
 <style>
 /* the tour page is one column of alternating text and picture; everything else comes from the product's own sheet */
-.plate{background:var(--band);color:var(--on-band);padding:var(--space-10) var(--gutter) var(--space-8);border-bottom:1px solid var(--band-line);position:relative;z-index:1}
+.plate{background:var(--band);color:var(--on-band);padding:var(--space-6) var(--gutter) var(--space-5);border-bottom:1px solid var(--band-line);position:relative;z-index:1}
+/* the band keeps to the share the design system gives it (47% of a 1280x900 first screen = 427px, top bar included) */
+.plate .actions{margin-top:var(--space-4)}
 .plate .inner{max-width:var(--content-max);margin:0 auto}
 .plate h1{font-size:var(--text-4xl);font-variation-settings:"opsz" var(--opsz-display);letter-spacing:var(--tracking-display);color:var(--on-band);margin-top:var(--space-3);max-width:20ch}
-.plate .lede{margin-top:var(--space-4);color:var(--on-band-2);max-width:var(--measure);font-size:var(--text-lg);line-height:var(--leading-lede)}
+.plate .lede{margin-top:var(--space-3);color:var(--on-band-2);max-width:var(--measure);font-size:var(--text-lg);line-height:var(--leading-lede)}
 .plate .eyebrow{color:var(--on-band-2)}
-.plate .rule{width:56px;height:2px;background:var(--point);margin-top:var(--space-5);border-radius:1px}
+.plate .rule{width:56px;height:2px;background:var(--point);margin-top:var(--space-4);border-radius:1px}
 .plate .actions a.btn-primary{background:var(--on-band);border-color:var(--on-band);color:var(--band)}
 .plate .actions a:not(.btn){color:var(--on-band);font-size:var(--text-sm)}
 figure{margin:0}
@@ -44,10 +46,10 @@ pre{margin:var(--space-4) 0 0;padding:var(--space-4);background:var(--surface-2)
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="brand" href="./" aria-label="Letterkeep home">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="15" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="14" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
     <b>Letterkeep</b><span>Reference-letter eligibility for one course — the roster stays on the professor's machine.</span>
   </a>
-  <span class="pill" title="This page is a tour: the app is a Flask server you run yourself, so there is nothing to try online.">Runs on your machine<span class="long"> · nothing hosted</span></span>
+  <span class="pill" title="This page is a tour: the app is a Flask server you run yourself, so there is nothing to try online.">Local app<span class="long"> · nothing hosted</span></span>
   <button class="btn btn-ghost btn-icon" id="theme" aria-label="Dark mode" aria-pressed="false" title="Dark mode"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
   <button type="button" class="btn btn-ghost btn-icon" id="nl-settings-button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.34 5.10L10.58 2.51L13.42 2.51L13.66 5.10A7.1 7.1 0 0 1 15.71 5.95L17.71 4.28L19.72 6.29L18.05 8.29A7.1 7.1 0 0 1 18.90 10.34L21.49 10.58L21.49 13.42L18.90 13.66A7.1 7.1 0 0 1 18.05 15.71L19.72 17.71L17.71 19.72L15.71 18.05A7.1 7.1 0 0 1 13.66 18.90L13.42 21.49L10.58 21.49L10.34 18.90A7.1 7.1 0 0 1 8.29 18.05L6.29 19.72L4.28 17.71L5.95 15.71A7.1 7.1 0 0 1 5.10 13.66L2.51 13.42L2.51 10.58L5.10 10.34A7.1 7.1 0 0 1 5.95 8.29L4.28 6.29L6.29 4.28L8.29 5.95A7.1 7.1 0 0 1 10.34 5.10Z"/><circle cx="12" cy="12" r="3"/></svg></button>
   <a class="btn btn-ghost gh" href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">GitHub</a>
@@ -151,6 +153,15 @@ python break_check.py         # five breaks, each caught by its own test</code><
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
   Appearance.bindSettings(document.getElementById('nl-settings-button'));
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]:not(.skip)'), function (a) {
+    a.addEventListener('click', function () {
+      var target = document.getElementById(a.getAttribute('href').slice(1));
+      if (!target) return;
+      var h = target.matches('h1, h2, h3') ? target : (target.querySelector('h2, h3') || target);
+      if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+      setTimeout(function () { h.focus(); }, 0);
+    });
+  });
   document.querySelector('.skip').addEventListener('click', function (e) {
     e.preventDefault();
     var h = document.querySelector('main h2') || document.getElementById('main');
