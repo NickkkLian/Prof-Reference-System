@@ -10,7 +10,7 @@ Grade priority is resolved BEFORE this function is called (in app.py):
 The grade_source parameter records which method was used.
 """
 
-import config, database as db
+from . import config, database as db
 
 def check(student_number: str, grade=None, grade_source="submitted"):
     identifiers  = db.get_identifiers_by_student(student_number)

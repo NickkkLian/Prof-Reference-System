@@ -5,11 +5,10 @@ Run this script once to populate the system with dummy data for demonstration.
 Usage: python3 create_sample_data.py
 """
 
-import os, sys, sqlite3
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import os, sqlite3
 
-import config, database as db
-from attendance_manager import import_file
+from . import config, database as db
+from .attendance_manager import import_file
 import openpyxl
 from datetime import datetime
 
@@ -117,24 +116,26 @@ def create_prof_token():
         print("✅ Professor token already exists")
 
 
-if __name__ == '__main__':
-    print("\n=== Prof Reference System — Sample Data Setup ===\n")
-    os.makedirs(config.DATA_DIR, exist_ok=True)
-    os.makedirs(config.TRANSCRIPT_UPLOAD_DIR, exist_ok=True)
-    os.makedirs(config.LETTER_UPLOAD_DIR, exist_ok=True)
-    os.makedirs(config.ATTENDANCE_INPUT_DIR, exist_ok=True)
+def main(quiet: bool = False) -> str:
+    """Create the demo data in config.DATA_DIR and return the professor token. Safe to run again: the token and the
+    thresholds are kept, the roster import skips rows it already has."""
+    say = (lambda *a: None) if quiet else print
+    say("\n=== Sample data ===\n")
+    for d in (config.DATA_DIR, config.TRANSCRIPT_UPLOAD_DIR, config.LETTER_UPLOAD_DIR, config.ATTENDANCE_INPUT_DIR):
+        os.makedirs(d, exist_ok=True)
 
     db.init_db()
     create_prof_token()
     create_thresholds()
 
     roster_path = create_sample_roster()
-    import_file(roster_path, verbose=True)
+    import_file(roster_path, verbose=not quiet)
     create_eligible_students()
 
     token = open(os.path.join(config.DATA_DIR, 'prof_token.txt')).read().strip()
-    print(f"\n=== Setup complete! ===")
-    print(f"Run: python3 app.py")
-    print(f"Student portal: http://localhost:5000")
-    print(f"Professor dashboard: http://localhost:5000/prof/{token}")
-    print()
+    say(f"\n15 students in 2 courses, 3 of them already checked as eligible.")
+    return token
+
+
+if __name__ == '__main__':          # python3 -m app.seed
+    main()

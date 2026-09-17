@@ -1,6 +1,6 @@
 import os, re
 from openpyxl import load_workbook
-import config, database as db
+from . import config, database as db
 
 REQUIRED_COLS_WITH_META    = {"student #", "first name", "last name", "%abs", "grade"}
 REQUIRED_COLS_WITHOUT_META = {"student #", "first name", "last name", "%abs", "grade"}

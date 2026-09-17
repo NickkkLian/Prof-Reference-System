@@ -11,7 +11,7 @@ Setup:
 """
 
 import urllib.request, urllib.error, json
-import config
+from . import config
 
 
 def _send(subject: str, body: str) -> tuple[bool, str]:
@@ -26,7 +26,7 @@ def _send(subject: str, body: str) -> tuple[bool, str]:
     sender = config.SENDER_EMAIL if config.SENDER_EMAIL else config.NOTIFY_EMAIL
 
     payload = json.dumps({
-        "sender":      {"name": "Mehran's Roster System", "email": sender},
+        "sender":      {"name": config.APP_NAME, "email": sender},
         "to":          [{"email": config.NOTIFY_EMAIL}],
         "subject":     subject,
         "textContent": body.strip(),
@@ -79,8 +79,8 @@ def test_email() -> tuple[bool, str]:
     if not config.BREVO_API_KEY:
         return False, "Please enter your Brevo API key first"
     ok, msg = _send(
-        subject="Test — Mehran's Roster System",
-        body="This is a test email from Mehran's Roster System.\n"
+        subject=f"Test — {config.APP_NAME}",
+        body=f"This is a test email from {config.APP_NAME}.\n"
              "If you received this, email notifications are working correctly."
     )
     if ok:

@@ -2,6 +2,10 @@ import os, secrets
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# What this install calls itself: window titles, the browser tab, the sender name on notification emails.
+# It was one faculty client's name in the delivered version; here it is a setting with the product's name as default.
+APP_NAME = os.environ.get('ROSTER_APP_NAME', 'Letterkeep')
+
 # When running as PyInstaller bundle, data dir is set by launcher.py
 # Otherwise default to data/ next to this file
 DATA_DIR = os.environ.get('ROSTER_DATA_DIR',

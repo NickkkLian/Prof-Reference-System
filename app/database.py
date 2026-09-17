@@ -9,7 +9,7 @@ import sqlite3
 import os
 from contextlib import contextmanager
 from datetime import datetime, timezone, timedelta
-import config
+from . import config
 
 def _vancouver_now_str() -> str:
     """Return current Vancouver time as string for DB storage (PDT = UTC-7)."""

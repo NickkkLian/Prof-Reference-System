@@ -1,5 +1,5 @@
-# roster.spec — PyInstaller build configuration
-# Run: pyinstaller roster.spec
+# roster.spec — PyInstaller build configuration for the desktop packaging
+# Run: pyinstaller roster.spec        (untested on the machine this was rewritten on, 2026-09-17)
 
 import sys
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
@@ -7,7 +7,7 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 block_cipher = None
 
 datas = [
-    ('templates', 'templates'),
+    ('app/templates', 'app/templates'),
 ]
 
 try:
@@ -26,12 +26,12 @@ hidden_imports = [
     'sqlite3', 'smtplib', 'email',
     'email.mime', 'email.mime.text', 'email.mime.multipart',
     'urllib', 'urllib.request', 'urllib.error',
-    'config', 'database', 'eligibility',
-    'transcript_parser', 'attendance_manager', 'notifier',
+    'app', 'app.config', 'app.database', 'app.eligibility',
+    'app.transcript_parser', 'app.attendance_manager', 'app.notifier', 'app.seed', 'app.web',
 ]
 
 a = Analysis(
-    ['launcher.py'],
+    ['run_desktop.py'],
     pathex=['.'],
     binaries=[],
     datas=datas,
@@ -48,18 +48,18 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 if sys.platform == 'darwin':
     exe = EXE(pyz, a.scripts, [], exclude_binaries=True,
-              name='ProfReferenceSystem', debug=False,
+              name='Letterkeep', debug=False,
               bootloader_ignore_signals=False, strip=False, upx=True, console=True)
     coll = COLLECT(exe, a.binaries, a.zipfiles, a.datas,
-                   strip=False, upx=True, name='ProfReferenceSystem')
-    app = BUNDLE(coll, name='ProfReferenceSystem.app', icon=None,
-                 bundle_identifier='com.prof.referencesystem',
+                   strip=False, upx=True, name='Letterkeep')
+    app = BUNDLE(coll, name='Letterkeep.app', icon=None,
+                 bundle_identifier='com.letterkeep.roster',
                  info_plist={
-                     'CFBundleName': 'Prof Reference System',
+                     'CFBundleName': 'Letterkeep',
                      'CFBundleShortVersionString': '1.0.0',
                      'NSHighResolutionCapable': True,
                  })
 else:
     exe = EXE(pyz, a.scripts, a.binaries, a.zipfiles, a.datas,
-              name='ProfReferenceSystem', debug=False,
+              name='Letterkeep', debug=False,
               bootloader_ignore_signals=False, strip=False, upx=True, console=True)

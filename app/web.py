@@ -33,10 +33,10 @@ from flask import (Flask, render_template, request, redirect,
                    url_for, flash, send_from_directory, abort, jsonify)
 from werkzeug.utils import secure_filename
 
-import config, database as db, eligibility as elig
-from transcript_parser import extract_grade_from_pdf
-from attendance_manager import import_file, import_all
-from notifier import send_submission_notification, test_email
+from . import config, database as db, eligibility as elig
+from .transcript_parser import extract_grade_from_pdf
+from .attendance_manager import import_file, import_all
+from .notifier import send_submission_notification, test_email
 
 # ── App setup ────────────────────────────────────────────────
 app = Flask(__name__)
@@ -622,11 +622,8 @@ def _load_thresholds():
 
 _load_thresholds()
 
-# ── Run ──────────────────────────────────────────────────────
-if __name__ == "__main__":
-    print("=" * 55)
-    print("  PROFESSOR REFERENCE SYSTEM")
-    print(f"  Professor URL: http://localhost:5000/prof/{PROF_TOKEN}")
-    print(f"  Student URL:   http://localhost:5000")
-    print("=" * 55)
-    app.run(debug=False, host="0.0.0.0", port=5000)
+
+# The page title follows the setting, so a template can say {{ app_name }} instead of a name baked into the HTML.
+@app.context_processor
+def _app_name():
+    return {"app_name": config.APP_NAME}
