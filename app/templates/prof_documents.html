@@ -1,110 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Documents{% endblock %}
-{% block navbar %}
-<nav class="nav">
-  <span class="nav-brand">Prof Reference System</span>
-  <div class="nav-links">
-    <a href="/prof/{{ token }}">Dashboard</a>
-    <a href="/prof/{{ token }}/import">Import Roster</a>
-    <a href="/prof/{{ token }}/roster">Roster</a>
-    <a href="/prof/{{ token }}/eligible">Eligible</a>
-    <a href="/prof/{{ token }}/documents" class="active">Documents</a>
-    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
-    <a href="/prof/{{ token }}/settings">Settings</a>
-  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
-  </div>
-</nav>
-{% endblock %}
+{% set page = 'documents' %}
+{% block title %}Documents — {{ app_name }}{% endblock %}
 {% block content %}
-<div class="page">
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for cat, msg in messages %}
-      <div class="alert alert-{{ 'success' if cat=='success' else 'error' }}"
-           style="margin-top:16px">{{ msg }}</div>
-    {% endfor %}
-  {% endwith %}
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px">
-
-    <!-- Letters -->
-    <div class="card" style="margin-bottom:0">
-      <div class="card-header">
-        <h1>📝 Letters of Interest</h1>
-        <p>{{ letters | length }} file(s) submitted</p>
-      </div>
-      <div class="card-body">
-        {% if letters %}
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Filename</th><th>Size</th><th>Submitted</th><th>⬇</th><th>🗑</th></tr></thead>
-            <tbody>
-              {% for f in letters %}
-              <tr>
-                <td style="font-size:.82em">{{ f.name }}</td>
-                <td style="color:var(--grey);font-size:.8em">{{ f.size }}</td>
-                <td style="color:var(--grey);font-size:.8em;white-space:nowrap">{{ f.modified }}</td>
-                <td>
-                  <a href="/prof/{{ token }}/letters/download/{{ f.name }}"
-                     class="btn btn-outline btn-sm">⬇</a>
-                </td>
-                <td>
-                  <form method="POST"
-                        action="/prof/{{ token }}/letters/delete/{{ f.name }}"
-                        onsubmit="return confirm('Delete {{ f.name }}?')">
-                    <button type="submit" class="btn btn-danger btn-sm">🗑</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p style="color:var(--grey)">No letters submitted yet.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Transcripts -->
-    <div class="card" style="margin-bottom:0">
-      <div class="card-header">
-        <h1>📄 Transcripts</h1>
-        <p>{{ transcripts | length }} file(s) submitted</p>
-      </div>
-      <div class="card-body">
-        {% if transcripts %}
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Filename</th><th>Size</th><th>Submitted</th><th>⬇</th><th>🗑</th></tr></thead>
-            <tbody>
-              {% for f in transcripts %}
-              <tr>
-                <td style="font-size:.82em">{{ f.name }}</td>
-                <td style="color:var(--grey);font-size:.8em">{{ f.size }}</td>
-                <td style="color:var(--grey);font-size:.8em;white-space:nowrap">{{ f.modified }}</td>
-                <td>
-                  <a href="/prof/{{ token }}/transcripts/download/{{ f.name }}"
-                     class="btn btn-outline btn-sm">⬇</a>
-                </td>
-                <td>
-                  <form method="POST"
-                        action="/prof/{{ token }}/transcripts/delete/{{ f.name }}"
-                        onsubmit="return confirm('Delete {{ f.name }}?')">
-                    <button type="submit" class="btn btn-danger btn-sm">🗑</button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p style="color:var(--grey)">No transcripts submitted yet.</p>
-        {% endif %}
-      </div>
-    </div>
-
-  </div>
+<div class="page-head">
+  <h1>Documents</h1>
+  <p>What students uploaded, as files on this machine. Deleting one here deletes the file; the eligibility record in
+     the list stays.</p>
 </div>
+
+{% for title, files, kind, dl, rm in [
+    ('Letters of interest', letters, 'letter', 'prof_download_letter', 'prof_delete_letter'),
+    ('Transcripts', transcripts, 'transcript', 'prof_download_transcript', 'prof_delete_transcript')] %}
+<section>
+  <h2>{{ title }} ({{ files | length }})</h2>
+  {% if files %}
+  <div class="tablewrap" tabindex="0" role="region" aria-label="{{ title }}, scrolls sideways" style="margin-top:var(--space-4)">
+    <table class="data">
+      <thead><tr><th>File</th><th class="num">Size</th><th>Uploaded</th><th>Open</th><th>Delete</th></tr></thead>
+      <tbody>
+        {% for f in files %}
+        <tr>
+          <td class="mono">{{ f.name }}</td>
+          <td class="num">{{ f.size }}</td>
+          <td>{{ f.modified }}</td>
+          <td><a class="btn btn-ghost" href="{{ url_for(dl, token=token, filename=f.name) }}">Download</a></td>
+          <td><form method="POST" action="{{ url_for(rm, token=token, filename=f.name) }}"
+                    onsubmit="return confirm('Delete {{ f.name }}? The file is removed from this machine.')">
+              <button class="btn btn-danger" type="submit">Delete</button></form></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="card empty" style="margin-top:var(--space-4)">
+    <b>No {{ title | lower }} yet</b>
+    <p>They arrive when a student submits on the student page.</p>
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
 {% endblock %}

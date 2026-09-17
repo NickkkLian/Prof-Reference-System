@@ -1,69 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Reference Letter Eligibility Check{% endblock %}
-
+{% block title %}Check your eligibility — {{ app_name }}{% endblock %}
+{% block main_class %} class="narrow"{% endblock %}
 {% block content %}
-<div class="page-sm">
-  <div class="card" style="margin-top:32px">
-    <div class="card-header">
-      <h1>📋 Reference Letter Eligibility</h1>
-      <p>Upload your documents to check if you qualify for a reference letter.</p>
-    </div>
-    <div class="card-body">
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for cat, msg in messages %}
-          <div class="alert alert-{{ 'error' if cat=='error' else 'info' }}">{{ msg }}</div>
-        {% endfor %}
-      {% endwith %}
-
-      <div class="alert alert-info">
-        Please upload both your official transcript and letter of interest to proceed.
-        Your grade will be extracted automatically from your transcript.
-      </div>
-
-      <form method="POST" action="/check" enctype="multipart/form-data">
-
-        <div class="form-group">
-          <label>Student Number *</label>
-          <input class="form-control" name="student_number"
-                 placeholder="e.g. 583214" required
-                 value="{{ prefill_sno or '' }}">
-        </div>
-
-        <div class="form-group">
-          <label>Official Transcript (PDF) *</label>
-          <input class="form-control" type="file" name="transcript"
-                 accept=".pdf" required>
-          <p class="hint">📌 Please name your file: <strong>STUDENTNUMBER_transcript.pdf</strong> (e.g. 583214_transcript.pdf)</p>
-        </div>
-
-        <div class="form-group">
-          <label>Letter of Interest (PDF) *</label>
-          <input class="form-control" type="file" name="letter"
-                 accept=".pdf" required>
-          <p class="hint">📌 Please name your file: <strong>STUDENTNUMBER_letter.pdf</strong> (e.g. 583214_letter.pdf)</p>
-        </div>
-
-        <div class="form-group" style="background:var(--light-blue);border:1px solid var(--border);
-             border-radius:8px;padding:14px 16px">
-          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400">
-            <input type="checkbox" name="consent" required
-                   style="margin-top:3px;flex-shrink:0;width:16px;height:16px">
-            <span style="font-size:.87rem;color:var(--text)">
-              I consent to my student information (student number, name, grade, and attendance)
-              being used solely for the purpose of determining eligibility for a reference letter.
-              This information will be stored securely and not shared with third parties. *
-            </span>
-          </label>
-        </div>
-
-        <button class="btn btn-primary" type="submit"
-                style="width:100%;padding:12px;font-size:1rem">
-          Check My Eligibility →
-        </button>
-
-      </form>
-    </div>
-  </div>
+<div class="page-head">
+  <span class="eyebrow">Reference letter · {{ course_label or 'this course' }}</span>
+  <h1>Do you qualify for a reference letter?</h1>
+  <p>Three conditions, all set by the professor: you are on the roster, your overall grade is at least
+     {{ '%g' % min_grade }}%, and your attendance is at least {{ '%g' % min_att }}% in every course you took with them.
+     Upload your transcript and your letter of interest and the answer comes back on the next page.</p>
 </div>
+
+<form class="card" method="POST" action="{{ url_for('student_check') }}" enctype="multipart/form-data">
+  <label class="field">
+    <span class="field-label">Student number</span>
+    <input name="student_number" inputmode="numeric" autocomplete="off" required
+           placeholder="e.g. 583214" value="{{ prefill_sno or '' }}">
+  </label>
+
+  <label class="field">
+    <span class="field-label">Official transcript (PDF)</span>
+    <input type="file" name="transcript" accept=".pdf" required>
+    <p class="hint">Name the file <b>STUDENTNUMBER_transcript.pdf</b> — for example 583214_transcript.pdf. The grade is
+       read from it; if it cannot be read, the next page asks you to type it.</p>
+  </label>
+
+  <label class="field">
+    <span class="field-label">Letter of interest (PDF)</span>
+    <input type="file" name="letter" accept=".pdf" required>
+    <p class="hint">Name the file <b>STUDENTNUMBER_letter.pdf</b>.</p>
+  </label>
+
+  <label class="consent">
+    <input type="checkbox" name="consent" required>
+    <span>I agree that my student number, name, grade and attendance may be used to decide whether I qualify for a
+      reference letter. The files and the result stay on the professor's machine and are not shared with anyone else.</span>
+  </label>
+
+  <div class="actions">
+    <button class="btn btn-primary btn-wide" type="submit">Check my eligibility</button>
+  </div>
+</form>
 {% endblock %}

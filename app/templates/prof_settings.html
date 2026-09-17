@@ -1,148 +1,69 @@
 {% extends "base.html" %}
-{% block title %}Settings{% endblock %}
-{% block navbar %}
-<nav class="nav">
-  <span class="nav-brand">Prof Reference System</span>
-  <div class="nav-links">
-    <a href="/prof/{{ token }}">Dashboard</a>
-    <a href="/prof/{{ token }}/import">Import Roster</a>
-    <a href="/prof/{{ token }}/roster">Roster</a>
-    <a href="/prof/{{ token }}/eligible">Eligible</a>
-    <a href="/prof/{{ token }}/documents">Documents</a>
-    <a href="/prof/{{ token }}/files">Manage Roster Files</a>
-    <a href="/prof/{{ token }}/settings" class="active">Settings</a>
-  <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Dark Mode</button>
-  </div>
-</nav>
-{% endblock %}
+{% set page = 'settings' %}
+{% block title %}Settings — {{ app_name }}{% endblock %}
 {% block content %}
-<div class="page">
+<div class="page-head">
+  <h1>Settings</h1>
+  <p>The two thresholds the rule uses, and where a notification goes when a student submits. Both are stored beside
+     the database on this machine.</p>
+</div>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for cat, msg in messages %}
-      <div class="alert alert-{{ 'success' if cat=='success' else 'error' }}"
-           style="margin-top:16px">{{ msg }}</div>
-    {% endfor %}
-  {% endwith %}
+{% if msg %}<p class="note {{ 'error' if msg_type == 'error' else 'done' }}">{{ msg | safe }}</p>{% endif %}
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px">
+<div class="grid two">
+  <form class="card" method="POST">
+    <h2>Eligibility thresholds</h2>
+    <p>A change applies to every check from then on. Students already marked eligible keep their record unless you
+       ask for the second button.</p>
 
-    <!-- LEFT: Thresholds -->
-    <div class="card" style="margin-bottom:0">
-      <div class="card-header">
-        <h1>⚙️ Eligibility Thresholds</h1>
-        <p>Changes take effect immediately for all subsequent checks.</p>
-      </div>
-      <div class="card-body">
+    <label class="field" style="margin-top:var(--space-4)">
+      <span class="field-label">Minimum overall grade (%)</span>
+      <input type="number" name="min_grade" min="0" max="100" step="0.5" value="{{ min_grade }}" required>
+    </label>
+    <label class="field">
+      <span class="field-label">Minimum attendance in every enrolment (%)</span>
+      <input type="number" name="min_att" min="0" max="100" step="0.5" value="{{ min_att }}" required>
+    </label>
 
-        {% if msg %}
-        <div class="alert {{ 'alert-success' if msg_type != 'error' else 'alert-error' }}">
-          {{ msg | safe }}
-        </div>
-        {% endif %}
-
-        <form method="POST">
-          <div class="form-group">
-            <label>Minimum Overall Grade % (m)</label>
-            <div style="display:flex;align-items:center;gap:14px">
-              <input type="range" name="min_grade_range" id="gr"
-                     min="50" max="100" step="0.5" value="{{ min_grade }}"
-                     oninput="document.getElementById('gv').value=parseFloat(this.value).toFixed(1)"
-                     style="flex:1">
-              <input type="number" name="min_grade" id="gv"
-                     min="50" max="100" step="0.5" value="{{ min_grade }}"
-                     oninput="document.getElementById('gr').value=this.value"
-                     class="form-control" style="width:90px">
-              <span style="color:var(--grey)">%</span>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top:20px">
-            <label>Minimum Attendance % (n)</label>
-            <div style="display:flex;align-items:center;gap:14px">
-              <input type="range" name="min_att_range" id="ar"
-                     min="50" max="100" step="0.5" value="{{ min_att }}"
-                     oninput="document.getElementById('av').value=parseFloat(this.value).toFixed(1)"
-                     style="flex:1">
-              <input type="number" name="min_att" id="av"
-                     min="50" max="100" step="0.5" value="{{ min_att }}"
-                     oninput="document.getElementById('ar').value=this.value"
-                     class="form-control" style="width:90px">
-              <span style="color:var(--grey)">%</span>
-            </div>
-          </div>
-
-          <hr>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <button class="btn btn-primary" type="submit" name="action" value="save">
-              💾 Save Thresholds
-            </button>
-            <button class="btn btn-danger" type="submit" name="action" value="save_and_recheck"
-                    onclick="return confirm('Save thresholds and remove any pending eligible students who no longer qualify?\n\nStudents with completed references will not be affected.')">
-              💾 Save & Remove Non-Eligible
-            </button>
-          </div>
-        </form>
-
-        <div class="alert alert-info" style="margin-top:20px">
-          <strong>Your secret professor URL:</strong><br>
-          <code style="font-size:.78rem;word-break:break-all">
-            {{ request.host_url }}prof/{{ token }}
-          </code><br>
-          <span style="font-size:.75rem;color:var(--grey)">
-            Bookmark this — never share with students.
-          </span>
-        </div>
-
-      </div>
+    <div class="actions">
+      <button class="btn btn-primary" type="submit" name="action" value="save">Save</button>
+      <button class="btn btn-danger" type="submit" name="action" value="save_and_recheck"
+              onclick="return confirm('Save, and remove the students who no longer qualify from the waiting list? Students whose letter is already written are left alone.')">
+        Save and drop those who no longer qualify</button>
     </div>
+  </form>
 
-    <!-- RIGHT: Email -->
-    <div class="card" style="margin-bottom:0">
-      <div class="card-header">
-        <h1>📧 Email Notifications</h1>
-        <p>Receive an email whenever a student submits their documents.</p>
-      </div>
-      <div class="card-body">
+  <div class="card">
+    <h2>Notification e-mail</h2>
+    <p>Optional. With nothing configured here, {{ app_name }} sends no mail at all — a submission only shows up in
+       the dashboard. The key is stored in a file next to the database.</p>
 
-        <div class="alert alert-info" style="margin-bottom:20px;font-size:.84rem">
-          Enter your email address below to receive a notification whenever a student submits their documents.
-        </div>
+    <form method="POST" action="{{ url_for('prof_save_email', token=token) }}" style="margin-top:var(--space-4)">
+      <label class="field">
+        <span class="field-label">Send notifications to</span>
+        <input type="email" name="notify_email" value="{{ notify_email or '' }}" placeholder="you@example.com">
+      </label>
+      <label class="field">
+        <span class="field-label">Brevo API key</span>
+        <input type="password" name="brevo_api_key" value="" autocomplete="off"
+               placeholder="{{ 'a key is saved — type a new one to replace it' if brevo_api_key else 'not set' }}">
+        <p class="hint">Brevo's free tier sends 300 mails a day. Leave blank to keep the saved key.</p>
+      </label>
+      <button class="btn btn-primary" type="submit">Save</button>
+    </form>
 
-        <form method="POST" action="/prof/{{ token }}/settings/email">
-          <div class="form-group">
-            <label>Notification Email *</label>
-            <input class="form-control" name="notify_email" type="email"
-                   placeholder="e.g. you@example.com"
-                   value="{{ notify_email or '' }}">
-            <p class="hint">This can be any email — Gmail, UBC, Outlook, etc.</p>
-          </div>
-          <input type="hidden" name="brevo_api_key" value="">
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <button class="btn btn-primary" type="submit">💾 Save Email</button>
-          </div>
-        </form>
-
-        <form method="POST" action="/prof/{{ token }}/settings/test-email"
-              style="margin-top:12px">
-          <input type="hidden" name="notify_email"  value="{{ notify_email or '' }}">
-          <input type="hidden" name="brevo_api_key" value="{{ brevo_api_key or '' }}">
-          <button class="btn btn-outline" type="submit">📤 Send Test Email</button>
-        </form>
-
-        {% if not notify_email %}
-        <div class="alert alert-error" style="margin-top:14px;font-size:.83rem">
-          No email configured — notifications are currently disabled.
-        </div>
-        {% else %}
-        <div class="alert alert-success" style="margin-top:14px;font-size:.83rem">
-          ✅ Notifications will be sent to <strong>{{ notify_email }}</strong>
-        </div>
-        {% endif %}
-
-      </div>
-    </div>
-
+    <form method="POST" action="{{ url_for('prof_test_email', token=token) }}" style="margin-top:var(--space-4)">
+      <input type="hidden" name="notify_email" value="{{ notify_email or '' }}">
+      <input type="hidden" name="brevo_api_key" value="{{ brevo_api_key or '' }}">
+      <button class="btn" type="submit">Send a test message</button>
+    </form>
   </div>
 </div>
+
+<section class="card">
+  <h2>The professor's address</h2>
+  <p>This page and the rest of the professor's side are behind the token in the address bar. Anyone who has the link
+     has this access, so treat it like a password: it is in <code>data/prof_token.txt</code> beside the database, and
+     deleting that file makes the program mint a new one on the next start.</p>
+</section>
 {% endblock %}

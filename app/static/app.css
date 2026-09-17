@@ -1,0 +1,185 @@
+/* Letterkeep — components on the product family's v4 design tokens (design-tokens.css).
+   Colours come only from tokens. The band (top bar, professor nav, footer) is the dark anchor; on it, focus rings and
+   selection use --on-band, and a primary button is inverted (--on-band fill, --band text), because in two of the three
+   palettes --accent is the band colour itself. Two audiences share this sheet: a student on a phone who fills one
+   form, and a professor at a desk reading tables. */
+
+/* ===== Fallback faces: until the web fonts load (or if they never do), system fonts are scaled to the measured widths so line lengths and column widths do not jump ===== */
+@font-face{font-family:"Fraunces Fallback";src:local("Georgia"),local("Times New Roman");size-adjust:93.3%}
+@font-face{font-family:"Inter Fallback";src:local("Helvetica Neue"),local("Arial"),local("Segoe UI");size-adjust:106.5%}
+@font-face{font-family:"Space Mono Fallback";src:local("Menlo Regular"),local("Menlo-Regular"),local("Consolas"),local("DejaVu Sans Mono");size-adjust:101.7%}
+
+/* ===== base ===== */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:calc(var(--sticky-top,var(--topbar-h)) + var(--space-3));accent-color:var(--accent)}
+body{margin:0;background:var(--bg);color:var(--text);font:var(--weight-regular) var(--text-md)/var(--leading-normal) var(--font-sans);
+  font-variant-numeric:lining-nums;-webkit-tap-highlight-color:transparent;min-height:100vh;display:flex;flex-direction:column}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--grain);opacity:var(--grain-opacity)}
+::selection{background:var(--selection-bg)}
+.topbar ::selection,.subnav ::selection,.honest ::selection{background:var(--on-band-2);color:var(--band)}
+:focus-visible{outline:var(--border-focus-width) solid var(--focus);outline-offset:2px;border-radius:var(--radius-xs)}
+.topbar :focus-visible,.subnav :focus-visible,.honest :focus-visible,.skip:focus-visible{outline-color:var(--on-band)}
+button{font:inherit;color:inherit}
+a{color:var(--accent-text);text-underline-offset:.18em;text-decoration-thickness:from-font}
+code,kbd,.mono,.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums lining-nums}
+svg{display:block}
+table{border-collapse:collapse}
+p{margin:0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{position:absolute;left:var(--space-2);top:-48px;z-index:var(--z-toast);background:var(--surface);color:var(--text);
+  padding:var(--space-2) var(--space-3);border:1px solid var(--border-input);border-radius:var(--radius-sm)}
+.skip:focus{top:var(--space-2)}
+.skip:focus-visible{outline-color:var(--on-band)}
+h1,h2,h3{margin:0;font-family:var(--font-display);font-weight:var(--display-weight);font-variation-settings:"opsz" var(--opsz-title);
+  line-height:var(--leading-tight);letter-spacing:var(--tracking-title);text-wrap:balance}
+h1{font-size:var(--text-2xl)}
+h2{font-size:var(--text-xl)}
+h3{font-size:var(--text-lg)}
+.eyebrow{font-family:var(--font-sans);font-size:var(--text-2xs);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-caps);
+  text-transform:uppercase;color:var(--text-3)}
+.caption{font-family:var(--font-display);font-style:var(--caption-style);font-weight:400;font-variation-settings:"opsz" var(--opsz-caption);
+  font-size:var(--text-sm);line-height:var(--leading-relaxed);color:var(--text-2);max-width:var(--measure)}
+/* form hints are instructions, not captions: they stay in the body face so they read as part of the field */
+.hint{font-size:var(--text-xs);line-height:var(--leading-relaxed);color:var(--text-2);max-width:var(--measure)}
+
+/* ===== top bar: the band ===== */
+.topbar{position:sticky;top:0;z-index:var(--z-sticky);min-height:var(--topbar-h);display:flex;align-items:center;gap:var(--space-3);
+  padding:0 var(--gutter);background:var(--band);color:var(--on-band);border-bottom:1px solid var(--band-line)}
+.brand{display:flex;align-items:center;gap:var(--space-2);color:inherit;text-decoration:none;min-width:0;flex:0 1 auto}
+.brand svg{flex:none}
+.brand b{font-family:var(--font-display);font-weight:var(--display-weight);font-variation-settings:"opsz" var(--opsz-title);
+  font-size:var(--text-xl);letter-spacing:-0.014em;white-space:nowrap;flex:none}
+.brand span{color:var(--on-band-2);font-size:var(--text-xs);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.topbar .pill{display:inline-flex;align-items:center;gap:var(--space-1);height:22px;padding:0 var(--space-2);border-radius:var(--radius-full);
+  white-space:nowrap;color:var(--on-band-2);font:var(--weight-regular) var(--text-2xs)/1 var(--font-mono);border:1px solid var(--band-line);
+  margin-inline-end:auto;flex:none}
+.topbar .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-band-warning);flex:none}
+.topbar .spacer{margin-inline-end:auto}
+
+/* ===== professor nav: a second band row, so the student pages carry none of it ===== */
+.subnav{position:sticky;top:var(--topbar-h);z-index:calc(var(--z-sticky) - 1);background:var(--nav-surface);color:var(--on-nav);
+  border-bottom:1px solid var(--nav-line);padding:0 var(--gutter);display:flex;gap:var(--space-1);overflow-x:auto;scrollbar-width:thin}
+.subnav a{color:var(--on-nav-2);text-decoration:none;font-size:var(--text-sm);padding:var(--space-2) var(--space-3);
+  border-bottom:2px solid transparent;white-space:nowrap;min-height:var(--touch-min);display:flex;align-items:center}
+.subnav a[aria-current="page"]{color:var(--on-nav);border-bottom-color:var(--point);font-weight:var(--weight-medium)}
+.subnav :focus-visible{outline-color:var(--on-nav)}
+
+/* ===== page ===== */
+main{position:relative;z-index:1;flex:1 0 auto;width:100%;max-width:var(--content-max);margin:0 auto;padding:var(--space-8) var(--gutter) var(--space-12)}
+main.narrow{max-width:46rem}
+.page-head{margin-bottom:var(--space-6)}
+.page-head p{color:var(--text-2);max-width:var(--measure);margin-top:var(--space-2)}
+section + section{margin-top:var(--space-8)}
+
+/* ===== cards ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-1);padding:var(--space-5)}
+.card + .card{margin-top:var(--space-4)}
+.card h2,.card h3{margin-bottom:var(--space-2)}
+.card p{color:var(--text-2);max-width:var(--measure)}
+.grid{display:grid;gap:var(--space-4)}
+@media (min-width:768px){.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== numbers at a glance ===== */
+.tiles{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
+.tile b{display:block;font-family:var(--font-display);font-size:var(--text-3xl);font-variation-settings:"opsz" var(--opsz-display);
+  letter-spacing:var(--tracking-display);line-height:1.05}
+.tile span{display:block;margin-top:var(--space-1);font-size:var(--text-2xs);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-3)}
+
+/* ===== forms ===== */
+.field{display:block;margin-bottom:var(--space-5);max-width:var(--measure)}
+.field > label,.field-label{display:block;font-size:var(--text-sm);font-weight:var(--weight-medium);margin-bottom:var(--space-2)}
+.field .hint{margin-top:var(--space-2);font-size:var(--text-xs)}
+input:not([type]),input[type=text],input[type=number],input[type=email],input[type=password],input[type=file],select,textarea{
+  width:100%;min-height:var(--touch-min);padding:var(--space-2) var(--space-3);font:inherit;color:var(--text);
+  background:var(--surface);border:1px solid var(--border-input);border-radius:var(--radius-sm)}
+input[type=file]{padding:var(--space-2)}
+input:disabled,select:disabled{color:var(--text-disabled);background:var(--surface-2)}
+.consent{display:flex;gap:var(--space-3);align-items:flex-start;background:var(--info-tint);color:var(--info-tint-text);
+  border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4);max-width:var(--measure)}
+.consent input{margin-top:.2em;width:1.05em;height:1.05em;flex:none}
+.consent span{font-size:var(--text-sm);line-height:var(--leading-relaxed)}
+
+/* ===== buttons ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--control-h);
+  padding:var(--space-2) var(--space-4);border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+  background:var(--surface);color:var(--text);font-size:var(--text-sm);font-weight:var(--weight-medium);cursor:pointer;text-decoration:none;
+  transition:background var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out)}
+.btn:active{transform:scale(var(--press-scale))}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn-danger{background:var(--surface);border-color:var(--danger);color:var(--danger)}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-icon{padding:var(--space-2);min-width:var(--control-h)}
+.btn-wide{width:100%;min-height:var(--touch-min);font-size:var(--text-md)}
+.topbar .btn-primary{background:var(--on-band);border-color:var(--on-band);color:var(--band)}
+.topbar .btn-ghost{color:var(--on-band)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;margin-top:var(--space-5)}
+@media (hover:hover) and (pointer:fine){
+  .btn:hover{background:var(--surface-hover)}
+  .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+  .btn-danger:hover{background:var(--danger-tint)}
+  .btn-ghost:hover{background:var(--neutral-tint)}
+  .topbar .btn-ghost:hover{background:var(--band-line)}
+  .subnav a:hover{background:var(--nav-selected);color:var(--on-nav)}
+}
+@media (prefers-reduced-motion:reduce){.btn:active{transform:none;background:var(--neutral-tint)}}
+@media (pointer:coarse){.btn{min-height:var(--touch-min)}.btn-icon{min-width:var(--touch-min)}}
+
+/* ===== verdicts: the answer a student came for ===== */
+.verdict{border-radius:var(--radius-md);padding:var(--space-5);border:1px solid var(--border);max-width:var(--measure)}
+.verdict h1{font-size:var(--text-2xl)}
+.verdict p{margin-top:var(--space-2)}
+.verdict.yes{background:var(--success-tint);color:var(--success-tint-text);border-color:var(--success)}
+.verdict.no{background:var(--warning-tint);color:var(--warning-tint-text);border-color:var(--warning)}
+.checklist{list-style:none;margin:var(--space-4) 0 0;padding:0;display:grid;gap:var(--space-2);font-size:var(--text-sm)}
+.checklist li{display:flex;gap:var(--space-2);align-items:baseline}
+.checklist li::before{content:"✓";font-family:var(--font-mono);color:var(--success)}
+.checklist li.short::before{content:"⊘";color:var(--warning)}
+
+.facts{list-style:none;margin:var(--space-3) 0 0;padding:0;display:grid;gap:var(--space-2);font-size:var(--text-sm)}
+.facts li{display:flex;justify-content:space-between;gap:var(--space-4);border-bottom:1px solid var(--hairline);padding-bottom:var(--space-2)}
+.facts li:last-child{border-bottom:0}
+.facts span{color:var(--text-2)}
+
+/* ===== messages ===== */
+.note{border:1px solid var(--border);border-left:3px solid var(--info);background:var(--info-tint);color:var(--info-tint-text);
+  border-radius:var(--radius-sm);padding:var(--space-3) var(--space-4);max-width:var(--measure);font-size:var(--text-sm)}
+.note + .note{margin-top:var(--space-3)}
+.note.error{border-left-color:var(--danger);background:var(--danger-tint);color:var(--danger-tint-text)}
+.note.done{border-left-color:var(--success);background:var(--success-tint);color:var(--success-tint-text)}
+
+/* ===== tables ===== */
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);box-shadow:var(--shadow-1)}
+.tablewrap:focus-visible{outline:var(--border-focus-width) solid var(--focus);outline-offset:2px}
+table.data{width:100%;font-size:var(--text-sm)}
+table.data caption{text-align:left;padding:var(--space-4) var(--space-4) 0;color:var(--text-2);font-size:var(--text-xs);caption-side:bottom;padding-bottom:var(--space-4)}
+table.data th,table.data td{padding:var(--space-3) var(--space-4);text-align:left;border-bottom:1px solid var(--hairline);white-space:nowrap}
+table.data thead th{background:var(--surface-2);font-size:var(--text-2xs);letter-spacing:var(--tracking-caps);text-transform:uppercase;
+  color:var(--text-2);font-weight:var(--weight-semibold);border-bottom:1px solid var(--border)}
+table.data tbody tr:last-child td{border-bottom:0}
+table.data .num{text-align:right}
+table.data th.num{text-align:right}
+.tag{display:inline-flex;align-items:center;gap:var(--space-1);padding:2px var(--space-2);border-radius:var(--radius-full);
+  font-size:var(--text-2xs);border:1px solid var(--border);color:var(--text-2);white-space:nowrap}
+.tag.yes{background:var(--success-tint);color:var(--success-tint-text);border-color:var(--success)}
+.tag.no{background:var(--warning-tint);color:var(--warning-tint-text);border-color:var(--warning)}
+.empty{padding:var(--space-8) var(--space-4);text-align:center;color:var(--text-2)}
+.empty b{display:block;font-family:var(--font-display);font-size:var(--text-lg);color:var(--text);margin-bottom:var(--space-2)}
+
+/* ===== footer: the band again, and the honest part ===== */
+.honest{position:relative;z-index:1;flex:none;background:var(--band);color:var(--on-band-2);border-top:1px solid var(--band-line);
+  padding:var(--space-8) var(--gutter)}
+.honest .inner{max-width:var(--content-max);margin:0 auto;display:grid;gap:var(--space-5)}
+@media (min-width:768px){.honest .inner{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.honest dt{font-size:var(--text-2xs);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--on-band-3);margin-bottom:var(--space-2)}
+.honest dd{margin:0;line-height:var(--leading-relaxed);max-width:var(--measure);font-size:var(--text-sm)}
+.honest a,.honest code{color:var(--on-band)}
+.honest a{text-decoration-color:var(--band-line)}
+
+@media (max-width:767px){
+  .topbar .brand span{display:none}
+  .topbar .pill .long{display:none}
+  .topbar .brand b{font-size:var(--text-lg)}
+  main{padding-top:var(--space-6)}
+}
+@media (max-width:419px){.topbar{gap:var(--space-2);padding:0 var(--space-3)}}

@@ -623,7 +623,10 @@ def _load_thresholds():
 _load_thresholds()
 
 
-# The page title follows the setting, so a template can say {{ app_name }} instead of a name baked into the HTML.
+# Every page needs the same three things: what this install calls itself and the two thresholds the rule uses, so the
+# student page can state the conditions instead of leaving them to be discovered on the result page.
 @app.context_processor
-def _app_name():
-    return {"app_name": config.APP_NAME}
+def _common():
+    return {"app_name": config.APP_NAME,
+            "min_grade": config.MIN_GRADE_PERCENT,
+            "min_att": config.MIN_ATTENDANCE_PERCENT}

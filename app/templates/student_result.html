@@ -1,73 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Eligibility Result{% endblock %}
+{% block title %}{{ 'Eligible' if r.eligible else 'Not eligible yet' }} — {{ app_name }}{% endblock %}
+{% block main_class %} class="narrow"{% endblock %}
 {% block content %}
-<div class="page-sm">
-  <div class="card" style="margin-top:32px">
-    <div class="card-header">
-      <h1>📋 Eligibility Result</h1>
-      <p>{{ r.student_name }} ({{ r.student_number }}) — checked {{ checked_at }}</p>
-    </div>
-    <div class="card-body">
+<div class="page-head">
+  <span class="eyebrow">{{ r.student_name }} · {{ r.student_number }} · checked {{ checked_at }}</span>
+  <h1 class="sr-only">Eligibility result</h1>
+</div>
 
-      {% if grade_note %}
-      <div class="alert alert-info">{{ grade_note }}</div>
-      {% endif %}
+<div class="verdict {{ 'yes' if r.eligible else 'no' }}">
+  <h1>{{ 'You qualify for a reference letter.' if r.eligible else 'You do not qualify yet.' }}</h1>
+  <p>{% if r.eligible %}Your professor sees this result in their dashboard together with the two files you uploaded.
+     {% else %}One of the three conditions is not met — the list below says which. If you think the roster is wrong,
+     speak to your professor; this page only reads what the roster says.{% endif %}</p>
+</div>
 
-      <div class="verdict {{ 'verdict-pass' if r.eligible else 'verdict-fail' }}">
-        {% if r.eligible %}
-          🎉 You are <strong>ELIGIBLE</strong> for a reference letter.
-        {% else %}
-          ❌ You are <strong>NOT ELIGIBLE</strong> for a reference letter at this time.
-        {% endif %}
-      </div>
+<section class="card">
+  <h2>The three conditions</h2>
+  <ul class="checklist">
+    <li class="{{ '' if r.in_db else 'short' }}">
+      <span>On the roster —
+      {% if r.in_db %}{{ r.identifiers | length }} enrolment{{ '' if r.identifiers | length == 1 else 's' }}:
+        <span class="mono">{{ r.identifiers | join(', ') }}</span>
+      {% else %}student number {{ r.student_number }} is not in the roster the professor imported{% endif %}</span>
+    </li>
+    <li class="{{ '' if r.grade_ok else 'short' }}">
+      <span>Grade at least {{ '%g' % r.min_grade }}% —
+      {% if r.grade is not none %}<span class="num">{{ '%.1f' % r.grade }}%</span>{% else %}not available{% endif %}
+      {% if r.grade_source %}<span class="hint">({{ r.grade_source }})</span>{% endif %}</span>
+    </li>
+    <li class="{{ '' if r.att_ok else 'short' }}">
+      <span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment —
+      {% for iid, rate in r.att_results.items() %}
+        <span class="mono">{{ iid }}</span>
+        {{ '%.1f' % rate ~ '%' if rate is not none else 'no figure' }}{{ '' if loop.last else ' · ' }}
+      {% endfor %}</span>
+    </li>
+  </ul>
+</section>
 
-      <div class="table-wrap">
-        <table class="criteria">
-          <thead><tr><th>Status</th><th>Criterion</th><th>Detail</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="tick {{ 'tick-pass' if r.in_db else 'tick-fail' }}">
-                {{ '✔' if r.in_db else '✘' }}</span></td>
-              <td>Enrolled in course database</td>
-              <td style="color:var(--grey);font-size:.83em">
-                {% if r.in_db %}{{ r.identifiers | join('<br>')|safe }}
-                {% else %}Student number not found{% endif %}
-              </td>
-            </tr>
-            <tr>
-              <td><span class="tick {{ 'tick-pass' if r.grade_ok else 'tick-fail' }}">
-                {{ '✔' if r.grade_ok else '✘' }}</span></td>
-              <td>Overall grade ≥ {{ r.min_grade }}%</td>
-              <td style="color:var(--grey);font-size:.83em">
-                {{ '%.1f' % r.grade if r.grade is not none else 'Not available' }}%
-                {% if r.grade_source %}<span style="color:#aaa">({{ r.grade_source }})</span>{% endif %}
-              </td>
-            </tr>
-            <tr>
-              <td><span class="tick {{ 'tick-pass' if r.att_ok else 'tick-fail' }}">
-                {{ '✔' if r.att_ok else '✘' }}</span></td>
-              <td>Attendance ≥ {{ r.min_att }}% (ALL enrolments)</td>
-              <td style="color:var(--grey);font-size:.83em">
-                {% for iid, rate in r.att_results.items() %}
-                  <span class="{{ 'tick-pass' if rate and rate >= r.min_att else 'tick-fail' }}">
-                    {{ '✔' if rate and rate >= r.min_att else '✘' }}</span>
-                  {{ iid }}: {{ '%.1f' % rate if rate is not none else 'N/A' }}%<br>
-                {% endfor %}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+{% if grade_note %}<p class="note">{{ grade_note }}</p>{% endif %}
 
-      {% if not r.eligible %}
-      <div class="alert alert-error" style="margin-top:16px">
-        If you believe this result is incorrect, please contact your professor directly.
-      </div>
-      {% endif %}
-
-
-
-    </div>
-  </div>
+<div class="actions">
+  <a class="btn" href="{{ url_for('student_home') }}">Check another student number</a>
 </div>
 {% endblock %}

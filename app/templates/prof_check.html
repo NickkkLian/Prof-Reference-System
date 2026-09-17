@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% set page = 'check' %}
+{% block title %}Check a student — {{ app_name }}{% endblock %}
+{% block main_class %} class="narrow"{% endblock %}
+{% macro conditions(r) -%}
+  <ul class="checklist">
+    <li class="{{ '' if r.in_db else 'short' }}"><span>On the roster —
+      {{ r.identifiers | join(', ') if r.in_db else 'student number not found' }}</span></li>
+    <li class="{{ '' if r.grade_ok else 'short' }}"><span>Grade at least {{ '%g' % r.min_grade }}% —
+      {{ '%.1f' % r.grade ~ '%' if r.grade is not none else 'not available' }} ({{ r.grade_source }})</span></li>
+    <li class="{{ '' if r.att_ok else 'short' }}"><span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment —
+      {% for iid, rate in r.att_results.items() %}{{ iid }}: {{ '%.1f' % rate ~ '%' if rate is not none else 'no figure' }}{{ '' if loop.last else ' · ' }}{% endfor %}</span></li>
+  </ul>
+{%- endmacro %}
+{% block content %}
+<div class="page-head">
+  <h1>Check a student</h1>
+  <p>For a student who wrote to you instead of using the student page. Nothing is uploaded and nothing is recorded —
+     this only reads the roster.</p>
+</div>
+
+<form class="card" method="POST" action="{{ url_for('prof_check', token=token) }}">
+  <label class="field">
+    <span class="field-label">Student number</span>
+    <input name="student_number" inputmode="numeric" placeholder="e.g. 583214" required autofocus>
+  </label>
+  <label class="field">
+    <span class="field-label">Grade override (optional)</span>
+    <input name="manual_grade" inputmode="decimal" placeholder="blank = the average of their roster grades">
+    <p class="hint">Use this when you hold a grade the roster does not have yet.</p>
+  </label>
+  <button class="btn btn-primary" type="submit">Check</button>
+</form>
+
+{% if result %}
+<div class="verdict {{ 'yes' if result.eligible else 'no' }}" style="margin-top:var(--space-5)">
+  <h2>{{ result.student_name }} ({{ result.student_number }}) —
+      {{ 'qualifies' if result.eligible else 'does not qualify' }}</h2>
+  {{ conditions(result) }}
+</div>
+{% endif %}
+{% endblock %}
