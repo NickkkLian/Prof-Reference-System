@@ -1,67 +1,162 @@
-> **v1 - superseded.** Early version, kept as a public sample. The current build (desktop dashboard + watchdog + Render portal, portal-based eligibility form, server-side email) is maintained privately and is no longer reflected here.
+# Letterkeep
 
-# Prof Reference System
+**Students check whether they qualify for a reference letter before they ask — the roster, the grades and the files never leave the professor's own machine.**
 
-A full-stack web application that automates student eligibility screening for professor reference letters. Built with Python/Flask, SQLite, and a custom HTML/CSS frontend.
+Built for a faculty client (name withheld) who was spending each term's last weeks answering the same question by
+hand. This repository is the v1 snapshot, kept as a public sample; the version in use is maintained privately and is
+not reflected here.
 
-This repository contains two versions of the same application, demonstrating different deployment approaches:
+[![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png)
 
-| Version | Folder | Best For |
-|---|---|---|
-| **Web App** | `web-app/` | Institutional server hosting (e.g. university IT infrastructure) |
-| **Desktop App** | `desktop-app/` | Local use — runs on your own computer, all data stays local |
+```bash
+pip install -r requirements.txt
+python3 run_web.py --seed        # demo data, then http://127.0.0.1:5001
+```
 
----
-
-## Features
-
-### Student Portal
-- Enter student number to check eligibility
-- Automatic eligibility check against imported roster
-- Consent acknowledgement before submission
-- Upload letter of interest (PDF)
-- Automatic email notification sent to professor on submission
-
-### Professor Dashboard
-- **Roster Management** — Import Excel roster files per course/section/term
-- **Eligibility Check** — Inline check by student number with grade auto-filled from database
-- **Eligible Students List** — Pending and completed sections with reference done checkbox
-- **Documents** — View, download, and delete submitted letters side by side
-- **Settings** — Adjustable grade and attendance thresholds; email notification configuration
-- **Dark Mode** — Black/orange theme, persisted across sessions
-
-### Eligibility Logic
-All three criteria must pass:
-1. Student number found in the imported roster database
-2. Overall grade ≥ minimum grade threshold (default 80%)
-3. Attendance ≥ minimum attendance threshold (default 75%) across all enrolments
+`--seed` writes fifteen made-up students across two courses, three of them already checked as eligible, and prints
+the professor's address — it is the student page plus a token, and the token is the only key to the professor's side.
 
 ---
 
-## Tech Stack
+## What it does
 
-| Layer | Technology |
+A professor sets two thresholds. A student uploads their transcript and a letter of interest and gets an answer to
+three conditions, all read from the roster the professor imported:
+
+1. **on the roster** — the student number appears in an imported roster file;
+2. **grade** — their overall grade is at or above the grade threshold (default 80%);
+3. **attendance** — their attendance is at or above the attendance threshold (default 75%) **in every enrolment**,
+   not on average: one course short is not eligible.
+
+The grade is read from the transcript PDF when it can be, and typed by the student when it cannot; which of the two
+happened is recorded and shown to the professor.
+
+| | |
 |---|---|
-| Backend | Python 3.10+, Flask |
-| Database | SQLite |
-| Frontend | HTML, CSS, Jinja2 |
-| Excel parsing | openpyxl |
-| Email | Brevo API |
-| Desktop packaging | PyInstaller |
+| ![The answer, and the three conditions with the figures behind them](docs/screenshot-result.png) | ![The professor's dashboard: counts, a quick check, and who was checked recently](docs/screenshot-dashboard.png) |
+| The student's answer | The professor's dashboard |
+
+```mermaid
+flowchart LR
+  R[Roster .xlsx] -->|import| DB[(SQLite on this machine)]
+  S[Student uploads<br/>transcript + letter] --> C{On the roster?<br/>Grade ≥ m?<br/>Attendance ≥ n<br/>in every enrolment?}
+  DB --> C
+  C -->|yes| E[Eligible list<br/>for the professor]
+  C -->|no| W[Which condition<br/>was short]
+  E -.->|only if configured| M[Notification e-mail]
+```
 
 ---
 
-## Privacy Considerations
+## Running it
 
-This system handles student personal information. Deployment must comply with applicable privacy legislation (e.g. BC FIPPA).
+| Command | What it does |
+|---|---|
+| `python3 run_web.py --seed` | demo data, then serves on `127.0.0.1:5001` |
+| `python3 run_web.py --host 0.0.0.0 --port 8000` | serve to the network as well — see the note below |
+| `python3 run_web.py --data-dir ~/letterkeep-data` | keep the database and uploads somewhere else |
+| `python3 run_desktop.py --seed` | the same app, opens the professor's dashboard in a browser |
+| `gunicorn -w 4 -b 127.0.0.1:8000 app.web:app` | behind a real server |
 
-- **Web App version** — intended for institutional server hosting on Canadian infrastructure
-- **Desktop App version** — all data stays on the local computer; fully privacy compliant
+The default binding is **this machine only**. `--host 0.0.0.0` puts the roster on the local network, where the
+professor's address is reachable by anyone who has it — a deliberate choice, not the default. Port 5001 is the
+default because on macOS port 5000 belongs to AirPlay Receiver.
+
+**The professor's address is the credential.** It is `data/prof_token.txt` beside the database; delete that file and
+the next start mints a new one, which invalidates the old link.
 
 ---
 
-## Quick Start
+## The roster file
 
-See the README inside each subfolder:
-- [`web-app/README.md`](web-app/README.md)
-- [`desktop-app/README.md`](desktop-app/README.md)
+An Excel file, one row per student. Course, section, year and term come from the import form, so the file needs only
+the student columns. Each column is matched against the spellings below, in any order and any case:
+
+| Column | Required | Accepted spellings |
+|---|---|---|
+| Student number | yes | `Student #`, `Student No`, `Student Number`, `Student ID`, `ID` |
+| First name | yes | `First Name`, `First`, `Given Name` |
+| Last name | yes | `Last Name`, `Last`, `Surname`, `Family Name` |
+| Absence | yes | `%Abs`, `Abs`, `Absence`, `Absence Rate`, `Abs%`, … |
+| Grade | optional | `Grade`, `Final Grade`, `Mark`, `Score` |
+
+An absence written as `0.04` and as `4` both mean four percent; attendance is 100 minus absence. A file missing a
+required column is refused and the message names what is missing.
+
+---
+
+## Checks
+
+```bash
+pip install -r requirements.txt pytest
+python -m pytest tests -q        # 23 tests
+python break_check.py            # breaks the rule five ways; each must be caught
+```
+
+The tests cover the three places where a mistake would be silent: the rule itself (including two courses with one
+short of attendance, and a row with no attendance figure, which must not read as a pass), the roster parser (the
+three spellings above), and the notifier — with nothing configured it must send nothing, and the tests enforce that
+by turning any outgoing request into an error rather than an e-mail.
+
+`break_check.py` breaks the rule in a copy of the code — attendance satisfied by one course, the grade threshold
+ignored, a missing figure counted as a pass, the roster aliases removed, the notifier's guard removed — and counts a
+break as caught only when **the test written for it** is the one that fails, so a suite that reddens for an unrelated
+reason is reported as not caught.
+
+GitHub Actions runs the tests on Python 3.10 and 3.13, the break check, and a start-up job that seeds the demo data
+and fetches both pages.
+
+---
+
+## Where the data lives
+
+Everything is beside the program: `data/letterkeep.db` (SQLite), `data/attendance_input/` (the roster files you
+import), `data/uploads/` (transcripts and letters), `data/prof_token.txt`, and the two settings files. Nothing is
+sent anywhere unless a notification address **and** a Brevo API key are configured in Settings; with either missing,
+the app sends nothing and says so.
+
+This handles student personal information, so where it runs matters: the desktop entry point keeps everything on one
+machine, and a server deployment should sit on infrastructure that satisfies the applicable privacy legislation
+(in British Columbia, FIPPA).
+
+---
+
+## What is not verified here
+
+- **Desktop packaging.** `roster.spec` builds a PyInstaller bundle; it has not been built or run on the machine this
+  version was written on. The checkout path (`python3 run_desktop.py`) is the one that is exercised.
+- **OCR for scanned transcripts.** `transcript_parser.py` falls back to OCR when a PDF has no extractable text; that
+  path needs the `tesseract` binary (`brew install tesseract`, or the UB Mannheim installer on Windows) and was not
+  run here. Without it, a scanned transcript takes the student to the "type your grade" page.
+- **E-mail delivery.** The notifier is tested with the request captured, never sent; no mail was sent from this
+  repository.
+- **The numbers in the demo data.** Fifteen made-up students, generated by `app/seed.py`.
+
+---
+
+## Layout
+
+```
+app/                  one package, both entry points use it
+  web.py              the Flask application: student pages and professor pages
+  eligibility.py      the rule, 45 lines
+  database.py         SQLite schema and queries
+  attendance_manager  roster (.xlsx) import
+  transcript_parser   grade extraction from a transcript PDF
+  notifier.py         Brevo notification (nothing configured = nothing sent)
+  seed.py             the demo data
+  templates/          Jinja templates
+  static/             design tokens, the theme kit, one stylesheet
+run_web.py            server entry point
+run_desktop.py        desktop entry point (data folder beside the program)
+break_check.py        breaks the rule five ways; each must be caught by its own test
+tests/                23 tests
+roster.spec           PyInstaller configuration for the desktop bundle
+```
+
+Until 2026-09-17 the same eight modules and eleven templates were in the repository twice, as `web-app/` and
+`desktop-app/`, byte for byte identical apart from the launcher and the packaging spec.
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).
