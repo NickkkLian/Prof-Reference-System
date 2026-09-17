@@ -1,0 +1,53 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # the declared dependencies, installed from empty, on the oldest and the newest Python the README claims
+      - run: pip install -r requirements.txt pytest
+      - run: python -m pytest tests -q
+
+  break:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt pytest
+      # breaks the rule five ways in a copy; green only if each break is caught by the test that should catch it
+      - run: python break_check.py
+
+  start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      # what a reader does first: seed the demo data and open the two pages
+      - run: |
+          python run_web.py --seed --port 5001 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:5001/ >/dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:5001/ | grep -q "Reference Letter" || { echo "student page did not render"; exit 1; }
+          token=$(cat app/data/prof_token.txt)
+          curl -sf "http://127.0.0.1:5001/prof/$token" | grep -qi "enrolments" || { echo "professor page did not render"; exit 1; }
+          echo "both pages served"

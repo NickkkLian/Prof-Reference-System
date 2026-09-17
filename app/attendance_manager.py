@@ -9,6 +9,20 @@ REQUIRED_COLS_WITHOUT_META = {"student #", "first name", "last name", "%abs", "g
 ABS_COL_NAMES = {"%abs", "abs", "absence", "absence %", "absent %",
                  "% abs", "abs%", "absences", "abs rate", "absence rate"}
 
+# Rosters come out of different systems, so the header a professor exports is not always the one this code reads.
+# The spellings the README promises are accepted here; the key on the left is what the rest of the file uses.
+COLUMN_ALIASES = {
+    "student #":  {"student #", "student#", "student no", "student no.", "student number", "student id", "id", "sid"},
+    "first name": {"first name", "first", "given name", "givenname", "firstname"},
+    "last name":  {"last name", "last", "surname", "family name", "lastname"},
+    "%abs":       ABS_COL_NAMES,
+    "grade":      {"grade", "final grade", "final mark", "mark", "score", "%"},
+    "course":     {"course", "course code", "subject"},
+    "section":    {"section", "sec"},
+    "year":       {"year", "session year"},
+    "term":       {"term", "session"},
+}
+
 def _build_id(course, section, year, term, sno):
     def c(v): return re.sub(r"[^A-Z0-9]", "", str(v).strip().upper())
     return "_".join(c(x) for x in [course, section, year, term, sno])
@@ -25,10 +39,13 @@ def parse_roster_file(filepath, course=None, section=None, year=None, term=None)
     raw = [str(c.value).strip().lower() if c.value else "" for c in ws[1]]
     idx = {h: i for i, h in enumerate(raw) if h}
 
-    # Find the absence column using any accepted name
-    abs_col = next((h for h in idx if h in ABS_COL_NAMES), None)
-    if abs_col:
-        idx["%abs"] = idx[abs_col]  # normalise to %abs key
+    # Normalise the headers this file happens to use to the keys the rest of the code reads
+    for key, names in COLUMN_ALIASES.items():
+        if key in idx:
+            continue
+        found = next((h for h in raw if h in names), None)
+        if found:
+            idx[key] = idx[found]
 
     # Determine mode: metadata from form or from file
     meta_from_form = all([course, section, year, term])
