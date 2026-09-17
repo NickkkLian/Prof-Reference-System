@@ -82,7 +82,7 @@ section + section{margin-top:var(--space-8)}
 /* ===== numbers at a glance ===== */
 .tiles{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
 .tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-4)}
-.tile b{display:block;font-family:var(--font-display);font-size:var(--text-3xl);font-variation-settings:"opsz" var(--opsz-display);
+.tile b{display:block;font-family:var(--font-display);font-size:var(--text-3xl);font-variant-numeric:tabular-nums lining-nums;font-variation-settings:"opsz" var(--opsz-display);
   letter-spacing:var(--tracking-display);line-height:1.05}
 .tile span{display:block;margin-top:var(--space-1);font-size:var(--text-2xs);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-3)}
 
