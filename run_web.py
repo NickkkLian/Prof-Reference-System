@@ -15,6 +15,8 @@ import os
 import socket
 import sys
 
+from pyversion import too_old
+
 
 def free(host: str, port: int) -> bool:
     with socket.socket() as s:
@@ -33,6 +35,11 @@ def main() -> int:
     p.add_argument("--port", type=int, default=5001, help="port (default: 5001; 5000 is taken by AirPlay on macOS)")
     p.add_argument("--data-dir", help="where the database, the roster files and the uploads live (default: app/data)")
     args = p.parse_args()
+
+    old = too_old()
+    if old:
+        print(old, file=sys.stderr)
+        return 2
 
     if args.data_dir:                                  # read by app.config at import time
         os.environ["ROSTER_DATA_DIR"] = os.path.abspath(args.data_dir)

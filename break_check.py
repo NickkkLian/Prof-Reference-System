@@ -43,6 +43,11 @@ BREAKS = [
      '    if not config.NOTIFY_EMAIL:\n        return False, "No notification email configured"',
      '    if False:\n        return False, "No notification email configured"',
      "test_no_address_configured_sends_nothing"),
+    ("python version: every interpreter is new enough",
+     "pyversion.py",
+     "    if version >= MIN_PYTHON:",
+     "    if True:",
+     "test_an_old_interpreter_is_told_what_it_has_and_what_it_needs"),
 ]
 
 

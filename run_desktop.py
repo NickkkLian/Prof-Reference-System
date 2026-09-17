@@ -17,6 +17,8 @@ import threading
 import time
 import webbrowser
 
+from pyversion import too_old
+
 
 def data_root() -> str:
     """Next to the .app / .exe when frozen (sys.executable is inside MyApp.app/Contents/MacOS/), next to this file
@@ -35,6 +37,11 @@ def main() -> int:
     p.add_argument("--port", type=int, default=5001)
     p.add_argument("--no-browser", action="store_true", help="do not open a browser window")
     args = p.parse_args()
+
+    old = too_old()
+    if old:
+        print(old, file=sys.stderr)
+        return 2
 
     os.environ.setdefault("ROSTER_DATA_DIR", os.path.join(data_root(), "data"))
     if getattr(sys, "frozen", False):

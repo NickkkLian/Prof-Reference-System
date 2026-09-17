@@ -124,15 +124,17 @@ pre{margin:var(--space-4) 0 0;padding:var(--space-4);background:var(--surface-2)
     <p class="intro">No licence, no account, no network: the demo data is fifteen made-up students in two courses.</p>
 <pre><code>git clone https://github.com/NickkkLian/Prof-Reference-System.git
 cd Prof-Reference-System
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 python3 run_web.py --seed</code></pre>
     <p class="hint" style="margin-top:var(--space-3)">It prints the student page and the professor's address — the
       same page plus a token, which is the only key to the professor's side. The server binds this machine only
-      unless <code>--host</code> says otherwise, and listens on 5001, because on macOS 5000 belongs to AirPlay.</p>
+      unless <code>--host</code> says otherwise, and listens on 5001, because on macOS 5000 belongs to AirPlay.
+      Python 3.10 or newer: macOS ships 3.9 as <code>/usr/bin/python3</code>, and the app says so and stops rather
+      than failing inside an import.</p>
     <p class="intro" style="margin-top:var(--space-5)">The rule is under test, and the tests have to be able to
       fail:</p>
-<pre><code>python -m pytest tests -q     # 23 tests
-python break_check.py         # five breaks, each caught by its own test</code></pre>
+<pre><code>python3 -m pytest tests -q    # 26 tests
+python3 break_check.py        # six breaks, each caught by its own test</code></pre>
   </section>
 </main>
 

@@ -9,9 +9,12 @@ not reflected here.
 [![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png)
 
 ```bash
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 python3 run_web.py --seed        # demo data, then http://127.0.0.1:5001
 ```
+
+Python 3.10 or newer. macOS ships 3.9 as `/usr/bin/python3`, which cannot run this — `run_web.py` says so and stops
+rather than failing inside an import.
 
 `--seed` writes fifteen made-up students across two courses, three of them already checked as eligible, and prints
 the professor's address — it is the student page plus a token, and the token is the only key to the professor's side.
@@ -56,7 +59,7 @@ flowchart LR
 | `python3 run_web.py --host 0.0.0.0 --port 8000` | serve to the network as well — see the note below |
 | `python3 run_web.py --data-dir ~/letterkeep-data` | keep the database and uploads somewhere else |
 | `python3 run_desktop.py --seed` | the same app, opens the professor's dashboard in a browser |
-| `gunicorn -w 4 -b 127.0.0.1:8000 app.web:app` | behind a real server |
+| `gunicorn -w 4 -b 127.0.0.1:8000 app.web:app` | behind a real server — `gunicorn` is not in `requirements.txt`, install it separately |
 
 The default binding is **this machine only**. `--host 0.0.0.0` puts the roster on the local network, where the
 professor's address is reachable by anyone who has it — a deliberate choice, not the default. Port 5001 is the
@@ -88,9 +91,9 @@ required column is refused and the message names what is missing.
 ## Checks
 
 ```bash
-pip install -r requirements.txt pytest
-python -m pytest tests -q        # 23 tests
-python break_check.py            # breaks the rule five ways; each must be caught
+python3 -m pip install -r requirements.txt pytest
+python3 -m pytest tests -q       # 26 tests
+python3 break_check.py           # breaks the rule six ways; each must be caught
 ```
 
 The tests cover the three places where a mistake would be silent: the rule itself (including two courses with one
@@ -99,18 +102,19 @@ three spellings above), and the notifier — with nothing configured it must sen
 by turning any outgoing request into an error rather than an e-mail.
 
 `break_check.py` breaks the rule in a copy of the code — attendance satisfied by one course, the grade threshold
-ignored, a missing figure counted as a pass, the roster aliases removed, the notifier's guard removed — and counts a
-break as caught only when **the test written for it** is the one that fails, so a suite that reddens for an unrelated
-reason is reported as not caught.
+ignored, a missing figure counted as a pass, the roster aliases removed, the notifier's guard removed, every Python
+called new enough — and counts a break as caught only when **the test written for it** is the one that fails, so a
+suite that reddens for an unrelated reason is reported as not caught.
 
-GitHub Actions runs the tests on Python 3.10 and 3.13, the break check, and a start-up job that seeds the demo data
-and fetches both pages.
+GitHub Actions runs the tests on Python 3.10 and 3.13, the break check, a 3.9 job that checks the app turns that
+version away with a sentence rather than a traceback, and a start-up job that seeds the demo data and fetches both
+pages.
 
 ---
 
 ## Where the data lives
 
-Everything is beside the program: `data/letterkeep.db` (SQLite), `data/attendance_input/` (the roster files you
+Everything is beside the program: `data/professor_reference.db` (SQLite), `data/attendance_input/` (the roster files you
 import), `data/uploads/` (transcripts and letters), `data/prof_token.txt`, and the two settings files. Nothing is
 sent anywhere unless a notification address **and** a Brevo API key are configured in Settings; with either missing,
 the app sends nothing and says so.
@@ -149,8 +153,9 @@ app/                  one package, both entry points use it
   static/             design tokens, the theme kit, one stylesheet
 run_web.py            server entry point
 run_desktop.py        desktop entry point (data folder beside the program)
-break_check.py        breaks the rule five ways; each must be caught by its own test
-tests/                23 tests
+pyversion.py          the Python version both entry points check before importing anything
+break_check.py        breaks the rule six ways; each must be caught by its own test
+tests/                26 tests
 roster.spec           PyInstaller configuration for the desktop bundle
 ```
 

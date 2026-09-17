@@ -32,6 +32,25 @@ jobs:
       # breaks the rule five ways in a copy; green only if each break is caught by the test that should catch it
       - run: python break_check.py
 
+  old-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      # macOS still ships 3.9 as /usr/bin/python3 and app/ cannot be imported on it. The entry point has to say which
+      # version to install and stop, instead of raising a TypeError from inside app/database.py. Nothing is installed
+      # here on purpose: the check runs before the first dependency is needed, and that is the point of it.
+      - run: |
+          set +e
+          out=$(python run_web.py --seed 2>&1); code=$?
+          set -e
+          printf '%s\n' "$out"
+          [ "$code" = "2" ] || { echo "expected exit 2 on Python 3.9, got $code"; exit 1; }
+          printf '%s' "$out" | grep -q "needs Python 3.10 or newer" || { echo "the message does not name the version to install"; exit 1; }
+          echo "3.9 is turned away with a sentence, not a traceback"
+
   start:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +66,16 @@ jobs:
             curl -sf http://127.0.0.1:5001/ >/dev/null && break
             sleep 1
           done
-          curl -sf http://127.0.0.1:5001/ | grep -q "Reference Letter" || { echo "student page did not render"; exit 1; }
+          # What each page must contain is a piece of its structure, not a phrase from its copy: the first version of
+          # this step looked for "Reference Letter" and the heading was later written "Reference letter", which would
+          # have failed the build over a lower-case l while both pages rendered perfectly.
+          student=$(curl -sf http://127.0.0.1:5001/)
+          for field in student_number transcript letter consent; do
+            printf '%s' "$student" | grep -q "name=\"$field\"" || { echo "student page is missing the $field field"; exit 1; }
+          done
           token=$(cat app/data/prof_token.txt)
-          curl -sf "http://127.0.0.1:5001/prof/$token" | grep -qi "enrolments" || { echo "professor page did not render"; exit 1; }
-          echo "both pages served"
+          prof=$(curl -sf "http://127.0.0.1:5001/prof/$token")
+          tiles=$(printf '%s' "$prof" | grep -c 'class="tile"')
+          [ "$tiles" -ge 4 ] || { echo "professor dashboard rendered $tiles tiles, expected 4"; exit 1; }
+          printf '%s' "$prof" | grep -q "/roster" || { echo "professor page has no link to the roster"; exit 1; }
+          echo "both pages served: student form has its four fields, dashboard has $tiles tiles"
