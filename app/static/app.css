@@ -69,6 +69,8 @@ main{position:relative;z-index:1;flex:1 0 auto;width:100%;max-width:var(--conten
 main.narrow{max-width:46rem}
 .page-head{margin-bottom:var(--space-6)}
 .page-head p{color:var(--text-2);max-width:var(--measure);margin-top:var(--space-2)}
+/* a section's opening paragraph is prose and keeps to the measure, like every other run of text */
+.intro{color:var(--text-2);max-width:var(--measure)}
 section + section{margin-top:var(--space-8)}
 
 /* ===== cards ===== */
