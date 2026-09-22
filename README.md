@@ -8,6 +8,8 @@ not reflected here.
 
 [![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png)
 
+**A one-page tour:** https://nickkklian.github.io/Prof-Reference-System/ — what it does and why, in a page. There is no hosted version to try: the roster, the grades and the files never leave the professor's machine, so the application runs on yours.
+
 ```bash
 python3 -m pip install -r requirements.txt
 python3 run_web.py --seed        # demo data, then http://127.0.0.1:5001
