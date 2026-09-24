@@ -1,5 +1,7 @@
 # Letterkeep
 
+![Letterkeep](.github/header.png)
+
 **Students check whether they qualify for a reference letter before they ask — the roster, the grades and the files never leave the professor's own machine.**
 
 Built for a faculty client (name withheld) who was spending each term's last weeks answering the same question by
