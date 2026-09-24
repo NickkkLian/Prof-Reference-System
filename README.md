@@ -70,7 +70,7 @@ The default binding is **this machine only**. `--host 0.0.0.0` puts the roster o
 professor's address is reachable by anyone who has it — a deliberate choice, not the default. Port 5001 is the
 default because on macOS port 5000 belongs to AirPlay Receiver.
 
-**The professor's address is the credential.** It is `data/prof_token.txt` beside the database; delete that file and
+**The professor's address is the credential.** It is `prof_token.txt` in the data folder, beside the database; delete that file and
 the next start mints a new one, which invalidates the old link.
 
 ---
@@ -119,8 +119,9 @@ pages.
 
 ## Where the data lives
 
-Everything is beside the program: `data/professor_reference.db` (SQLite), `data/attendance_input/` (the roster files you
-import), `data/uploads/` (transcripts and letters), `data/prof_token.txt`, and the two settings files. Nothing is
+Everything is in the data folder beside the program (`data/`, or `app/data/` when you start it with `run_web.py`;
+`--data-dir` picks another): `professor_reference.db` (SQLite), `attendance_input/` (the roster files you import),
+`uploads/` (transcripts and letters), `prof_token.txt`, and the two settings files. Nothing is
 sent anywhere unless a notification address **and** a Brevo API key are configured in Settings; with either missing,
 the app sends nothing and says so.
 

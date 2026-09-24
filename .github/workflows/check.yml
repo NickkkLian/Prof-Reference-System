@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install -r requirements.txt pytest
-      # breaks the rule five ways in a copy; green only if each break is caught by the test that should catch it
+      # breaks the rule six ways in a copy; green only if each break is caught by the test that should catch it
       - run: python break_check.py
 
   old-python:

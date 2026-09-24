@@ -213,3 +213,5 @@ data/email_settings.txt
 data/saved_thresholds.txt
 data/uploads/
 data/attendance_input/
+# run_web.py keeps the same files in app/data/ by default
+app/data/

@@ -2,7 +2,7 @@
 database.py
 -----------
 All SQLite database operations for the Professor Reference System.
-The database is a single .db file stored in the Drive folder.
+The database is a single .db file stored in the data folder.
 """
 
 import sqlite3

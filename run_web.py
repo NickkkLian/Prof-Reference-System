@@ -2,10 +2,10 @@
 """run_web.py — start Letterkeep as a web app (one command, no setup).
 
     python3 run_web.py --seed        demo data (15 students, 2 courses), then serve on http://127.0.0.1:5001
-    python3 run_web.py               serve whatever is already in data/
+    python3 run_web.py               serve whatever is already in app/data/ (or in --data-dir)
     python3 run_web.py --port 8000 --host 0.0.0.0     serve to the network as well (see the note below)
 
-The professor's page lives behind a token in the URL; the token is printed on startup and kept in data/prof_token.txt.
+The professor's page lives behind a token in the URL; the token is printed on startup and kept in app/data/prof_token.txt.
 Default host is 127.0.0.1: this machine only. --host 0.0.0.0 makes the roster reachable by anyone on the same network
 who knows (or guesses their way to) that URL, so it is a choice, not the default. For a real deployment behind a
 server, point gunicorn at the same app object:  gunicorn -w 4 -b 127.0.0.1:8000 app.web:app
