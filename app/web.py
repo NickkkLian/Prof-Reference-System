@@ -124,7 +124,7 @@ def student_check():
     valid_db  = [v for v in db_grades.values() if v is not None]
     if valid_db:
         grade     = round(sum(valid_db) / len(valid_db), 2)
-        grade_note = f"Your grade ({grade:.1f}%) was found in the course records."
+        grade_note = ""   # the checklist says the grade came from the course records; the figure stays with the professor
         return _run_eligibility(sno, grade, "database",
                                 trans_fname, letter_fname, grade_note)
 
@@ -553,7 +553,7 @@ def prof_settings(token):
                            min_att=config.MIN_ATTENDANCE_PERCENT,
                            msg=msg, msg_type=msg_type,
                            notify_email=config.NOTIFY_EMAIL,
-                           brevo_api_key=config.BREVO_API_KEY)
+                           brevo_key_saved=bool(config.BREVO_API_KEY))   # never the key itself: it would land in the HTML
 
 
 @app.route("/prof/<token>/settings/email", methods=["POST"])

@@ -43,8 +43,8 @@ def enrol(data_dir):
     def add(student_number: str, course: str, attendance_pct: float, grade=None, name="Test Student"):
         first, _, last = name.partition(" ")
         db.upsert_enrolment({
-            "identifier": f"{course.replace(' ', '')}_101_2025_W1_{student_number}",
-            "course": course, "section": "101", "year": "2025", "term": "W1",
+            "identifier": f"{course.replace(' ', '')}_101_2025_Fall_{student_number}",
+            "course": course, "section": "101", "year": "2025", "term": "Fall",
             "student_number": student_number, "student_name": name,
             "first_name": first, "last_name": last,
             "absence_rate_pct": None if attendance_pct is None else round(100 - attendance_pct, 4),

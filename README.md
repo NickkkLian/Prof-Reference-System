@@ -36,11 +36,12 @@ three conditions, all read from the roster the professor imported:
    not on average: one course short is not eligible.
 
 The grade is read from the transcript PDF when it can be, and typed by the student when it cannot; which of the two
-happened is recorded and shown to the professor.
+happened is recorded and shown to the professor. The student's page shows the answer and which condition is met,
+but no name, enrolment or figure from the roster: anyone who knows a student number can open it.
 
 | | |
 |---|---|
-| ![The answer, and the three conditions with the figures behind them](docs/screenshot-result.png) | ![The professor's dashboard: counts, a quick check, and who was checked recently](docs/screenshot-dashboard.png) |
+| ![The answer, and which of the three conditions are met](docs/screenshot-result.png) | ![The professor's dashboard: counts, a quick check, and who was checked recently](docs/screenshot-dashboard.png) |
 | The student's answer | The professor's dashboard |
 
 ```mermaid

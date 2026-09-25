@@ -15,7 +15,7 @@ from datetime import datetime
 def create_sample_roster():
     """Create a sample roster Excel file with fake student data."""
     os.makedirs(config.ATTENDANCE_INPUT_DIR, exist_ok=True)
-    path = os.path.join(config.ATTENDANCE_INPUT_DIR, 'Sample_Roster_COMM436_2025_W1.xlsx')
+    path = os.path.join(config.ATTENDANCE_INPUT_DIR, 'Sample_Roster_DEMO310_2025_Fall.xlsx')
 
     wb = openpyxl.Workbook()
     ws = wb.active
@@ -26,21 +26,21 @@ def create_sample_roster():
     ws.append(headers)
 
     students = [
-        ('10001001', 'Alice',   'Chen',      '2025', 'W1', 'COMM 436', '101', 0.02, 88.5),
-        ('10001002', 'Bob',     'Martinez',  '2025', 'W1', 'COMM 436', '101', 0.05, 92.0),
-        ('10001003', 'Carol',   'Smith',     '2025', 'W1', 'COMM 436', '101', 0.30, 85.0),
-        ('10001004', 'David',   'Kim',       '2025', 'W1', 'COMM 436', '101', 0.08, 74.0),
-        ('10001005', 'Emma',    'Johnson',   '2025', 'W1', 'COMM 436', '101', 0.04, 91.5),
-        ('10001006', 'Frank',   'Lee',       '2025', 'W1', 'COMM 436', '101', 0.12, 79.0),
-        ('10001007', 'Grace',   'Wang',      '2025', 'W1', 'COMM 436', '101', 0.03, 95.0),
-        ('10001008', 'Henry',   'Brown',     '2025', 'W1', 'COMM 436', '101', 0.25, 83.0),
-        ('10001009', 'Iris',    'Davis',     '2025', 'W1', 'COMM 436', '101', 0.06, 87.0),
-        ('10001010', 'James',   'Wilson',    '2025', 'W1', 'COMM 436', '101', 0.40, 90.0),
-        ('10002001', 'Karen',   'Taylor',    '2025', 'W1', 'COMM 437', '201', 0.03, 89.0),
-        ('10002002', 'Liam',    'Anderson',  '2025', 'W1', 'COMM 437', '201', 0.07, 82.5),
-        ('10002003', 'Mia',     'Thomas',    '2025', 'W1', 'COMM 437', '201', 0.02, 94.0),
-        ('10002004', 'Noah',    'Jackson',   '2025', 'W1', 'COMM 437', '201', 0.15, 76.0),
-        ('10002005', 'Olivia',  'White',     '2025', 'W1', 'COMM 437', '201', 0.04, 88.0),
+        ('10001001', 'Alice',   'Chen',      '2025', 'Fall', 'DEMO 310', '101', 0.02, 88.5),
+        ('10001002', 'Bob',     'Martinez',  '2025', 'Fall', 'DEMO 310', '101', 0.05, 92.0),
+        ('10001003', 'Carol',   'Smith',     '2025', 'Fall', 'DEMO 310', '101', 0.30, 85.0),
+        ('10001004', 'David',   'Kim',       '2025', 'Fall', 'DEMO 310', '101', 0.08, 74.0),
+        ('10001005', 'Emma',    'Johnson',   '2025', 'Fall', 'DEMO 310', '101', 0.04, 91.5),
+        ('10001006', 'Frank',   'Lee',       '2025', 'Fall', 'DEMO 310', '101', 0.12, 79.0),
+        ('10001007', 'Grace',   'Wang',      '2025', 'Fall', 'DEMO 310', '101', 0.03, 95.0),
+        ('10001008', 'Henry',   'Brown',     '2025', 'Fall', 'DEMO 310', '101', 0.25, 83.0),
+        ('10001009', 'Iris',    'Davis',     '2025', 'Fall', 'DEMO 310', '101', 0.06, 87.0),
+        ('10001010', 'James',   'Wilson',    '2025', 'Fall', 'DEMO 310', '101', 0.40, 90.0),
+        ('10002001', 'Karen',   'Taylor',    '2025', 'Fall', 'DEMO 320', '201', 0.03, 89.0),
+        ('10002002', 'Liam',    'Anderson',  '2025', 'Fall', 'DEMO 320', '201', 0.07, 82.5),
+        ('10002003', 'Mia',     'Thomas',    '2025', 'Fall', 'DEMO 320', '201', 0.02, 94.0),
+        ('10002004', 'Noah',    'Jackson',   '2025', 'Fall', 'DEMO 320', '201', 0.15, 76.0),
+        ('10002005', 'Olivia',  'White',     '2025', 'Fall', 'DEMO 320', '201', 0.04, 88.0),
     ]
 
     for s in students:
@@ -59,24 +59,24 @@ def create_eligible_students():
             'student_name': 'Alice Chen',
             'grade': 88.5,
             'grade_source': 'database',
-            'identifiers': ['COMM436_101_2025_W1_10001001'],
-            'att_rates': {'COMM436_101_2025_W1_10001001': 98.0},
+            'identifiers': ['DEMO310_101_2025_Fall_10001001'],
+            'att_rates': {'DEMO310_101_2025_Fall_10001001': 98.0},
         },
         {
             'student_number': '10001002',
             'student_name': 'Bob Martinez',
             'grade': 92.0,
             'grade_source': 'database',
-            'identifiers': ['COMM436_101_2025_W1_10001002'],
-            'att_rates': {'COMM436_101_2025_W1_10001002': 95.0},
+            'identifiers': ['DEMO310_101_2025_Fall_10001002'],
+            'att_rates': {'DEMO310_101_2025_Fall_10001002': 95.0},
         },
         {
             'student_number': '10002003',
             'student_name': 'Mia Thomas',
             'grade': 94.0,
             'grade_source': 'database',
-            'identifiers': ['COMM437_201_2025_W1_10002003'],
-            'att_rates': {'COMM437_201_2025_W1_10002003': 98.0},
+            'identifiers': ['DEMO320_201_2025_Fall_10002003'],
+            'att_rates': {'DEMO320_201_2025_Fall_10002003': 98.0},
         },
     ]
 

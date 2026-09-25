@@ -3,7 +3,7 @@
 {% block main_class %} class="narrow"{% endblock %}
 {% block content %}
 <div class="page-head">
-  <span class="eyebrow">{{ r.student_name }} · {{ r.student_number }} · checked {{ checked_at }}</span>
+  <span class="eyebrow">{{ r.student_number }} · checked {{ checked_at }}</span>
   <h1 class="sr-only">Eligibility result</h1>
 </div>
 
@@ -17,30 +17,27 @@
 <section class="card">
   <h2>The three conditions</h2>
   <ul class="checklist">
+    {# Anyone who knows a student number can open this page, so it shows no name, enrolment or figure from the
+       roster: only whether each condition is met, and a grade only when the student supplied it. #}
     <li class="{{ '' if r.in_db else 'short' }}">
-      <span>On the roster —
-      {% if r.in_db %}{{ r.identifiers | length }} enrolment{{ '' if r.identifiers | length == 1 else 's' }}:
-        <span class="mono">{{ r.identifiers | join(', ') }}</span>
-      {% else %}student number {{ r.student_number }} is not in the roster the professor imported{% endif %}</span>
+      <span>On the roster — {{ 'yes' if r.in_db else 'no: this student number is not in the roster the professor imported' }}</span>
     </li>
     <li class="{{ '' if r.grade_ok else 'short' }}">
-      <span>Grade at least {{ '%g' % r.min_grade }}% —
-      {% if r.grade is not none %}<span class="num">{{ '%.1f' % r.grade }}%</span>{% else %}not available{% endif %}
-      {% if r.grade_source %}<span class="hint">({{ r.grade_source }})</span>{% endif %}</span>
+      <span>Grade at least {{ '%g' % r.min_grade }}% — {{ 'met' if r.grade_ok else 'not met' }}
+      {% if r.grade is not none and r.grade_source in ('transcript', 'manual') %}<span class="num">({{ '%.1f' % r.grade }}%, {{ 'from your transcript' if r.grade_source == 'transcript' else 'as you entered it' }})</span>
+      {% elif r.grade_source == 'database' %}<span class="hint">(from the course records)</span>{% endif %}</span>
     </li>
     <li class="{{ '' if r.att_ok else 'short' }}">
-      <span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment —
-      {% for iid, rate in r.att_results.items() %}
-        <span class="mono">{{ iid }}</span>
-        {{ '%.1f' % rate ~ '%' if rate is not none else 'no figure' }}{{ '' if loop.last else ' · ' }}
-      {% endfor %}</span>
+      <span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment — {{ 'met' if r.att_ok else 'not met' }}</span>
     </li>
   </ul>
+  <p class="hint" style="margin-top:var(--space-4)">This page shows no names or figures from the professor's records.
+    Your professor sees the details.</p>
 </section>
 
 {% if grade_note %}<p class="note">{{ grade_note }}</p>{% endif %}
 
 <div class="actions">
-  <a class="btn" href="{{ url_for('student_home') }}">Check another student number</a>
+  <a class="btn" href="{{ url_for('student_home') }}">Start again</a>
 </div>
 {% endblock %}

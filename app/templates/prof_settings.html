@@ -46,7 +46,7 @@
       <label class="field">
         <span class="field-label">Brevo API key</span>
         <input type="password" name="brevo_api_key" value="" autocomplete="off"
-               placeholder="{{ 'a key is saved — type a new one to replace it' if brevo_api_key else 'not set' }}">
+               placeholder="{{ 'a key is saved — type a new one to replace it' if brevo_key_saved else 'not set' }}">
         <p class="hint">Brevo's free tier sends 300 mails a day. Leave blank to keep the saved key.</p>
       </label>
       <button class="btn btn-primary" type="submit">Save</button>
@@ -54,7 +54,6 @@
 
     <form method="POST" action="{{ url_for('prof_test_email', token=token) }}" style="margin-top:var(--space-4)">
       <input type="hidden" name="notify_email" value="{{ notify_email or '' }}">
-      <input type="hidden" name="brevo_api_key" value="{{ brevo_api_key or '' }}">
       <button class="btn" type="submit">Send a test message</button>
     </form>
   </div>

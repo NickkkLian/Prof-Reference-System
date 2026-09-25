@@ -12,13 +12,13 @@
 <form class="card" method="POST" enctype="multipart/form-data">
   <div class="grid two">
     <label class="field"><span class="field-label">Course code</span>
-      <input name="course" required placeholder="e.g. COMM 436" value="{{ form_vals.get('course','') }}"></label>
+      <input name="course" required placeholder="e.g. DEMO 310" value="{{ form_vals.get('course','') }}"></label>
     <label class="field"><span class="field-label">Section</span>
       <input name="section" required placeholder="e.g. 101" value="{{ form_vals.get('section','') }}"></label>
     <label class="field"><span class="field-label">Year</span>
       <input name="year" required placeholder="e.g. 2025" value="{{ form_vals.get('year','') }}"></label>
     <label class="field"><span class="field-label">Term</span>
-      <input name="term" required placeholder="e.g. W1" value="{{ form_vals.get('term','') }}"></label>
+      <input name="term" required placeholder="e.g. Fall" value="{{ form_vals.get('term','') }}"></label>
   </div>
 
   <label class="field">
