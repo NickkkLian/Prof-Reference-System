@@ -98,7 +98,7 @@ required column is refused and the message names what is missing.
 
 ```bash
 python3 -m pip install -r requirements.txt pytest
-python3 -m pytest tests -q       # 30 tests
+python3 -m pytest tests -q       # 33 tests
 python3 break_check.py           # breaks the rule six ways; each must be caught
 ```
 
@@ -162,7 +162,7 @@ run_web.py            server entry point
 run_desktop.py        desktop entry point (data folder beside the program)
 pyversion.py          the Python version both entry points check before importing anything
 break_check.py        breaks the rule six ways; each must be caught by its own test
-tests/                30 tests
+tests/                33 tests
 roster.spec           PyInstaller configuration for the desktop bundle
 ```
 
