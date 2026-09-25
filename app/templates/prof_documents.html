@@ -25,7 +25,7 @@
           <td>{{ f.modified }}</td>
           <td><a class="btn btn-ghost" href="{{ url_for(dl, token=token, filename=f.name) }}">Download</a></td>
           <td><form method="POST" action="{{ url_for(rm, token=token, filename=f.name) }}"
-                    onsubmit="return confirm('Delete {{ f.name }}? The file is removed from this machine.')">
+                    data-confirm="Delete {{ f.name }}? The file is removed from this machine.">
               <button class="btn btn-danger" type="submit">Delete</button></form></td>
         </tr>
         {% endfor %}

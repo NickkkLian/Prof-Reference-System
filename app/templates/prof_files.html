@@ -24,7 +24,7 @@
         <td class="num">{{ row.student_count if row else '—' }}</td>
         <td>{{ row.last_updated if row else 'not imported' }}</td>
         <td><form method="POST" action="{{ url_for('prof_delete_file', token=token, filename=f.name) }}"
-                  onsubmit="return confirm('Delete {{ f.name }} and every enrolment that came from it?')">
+                  data-confirm="Delete {{ f.name }} and every enrolment that came from it?">
             <button class="btn btn-danger" type="submit">Delete</button></form></td>
       </tr>
       {% endfor %}
@@ -58,7 +58,7 @@
           <td class="num">{{ row.enrolment_count }}</td>
           <td class="num">{{ row.student_count }}</td>
           <td><form method="POST" action="{{ url_for('prof_delete_file', token=token, filename=name) }}"
-                    onsubmit="return confirm('Delete every enrolment that came from {{ name }}?')">
+                    data-confirm="Delete every enrolment that came from {{ name }}?">
               <button class="btn btn-danger" type="submit">Delete</button></form></td>
         </tr>
         {% endfor %}

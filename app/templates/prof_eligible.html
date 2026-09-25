@@ -32,7 +32,7 @@
         <td>{% if r.letter_file %}<a class="btn btn-ghost" href="{{ url_for('prof_download_letter', token=token, filename=r.letter_file) }}">Download</a>{% else %}—{% endif %}</td>
         <td>{{ r.checked_at }}</td>
         <td><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
-                  onsubmit="return confirm('Remove {{ r.student_name }} from the eligible list?')">
+                  data-confirm="Remove {{ r.student_name }} from the eligible list?">
             <button class="btn btn-danger" type="submit">Remove</button>
         </form></td>
       </tr>
@@ -64,7 +64,7 @@
           <td class="num">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct else '—' }}</td>
           <td>{{ r.checked_at }}</td>
           <td><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
-                    onsubmit="return confirm('Remove {{ r.student_name }} from the list?')">
+                    data-confirm="Remove {{ r.student_name }} from the list?">
               <button class="btn btn-danger" type="submit">Remove</button>
           </form></td>
         </tr>

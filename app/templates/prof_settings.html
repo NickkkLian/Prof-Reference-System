@@ -8,7 +8,7 @@
      the database on this machine.</p>
 </div>
 
-{% if msg %}<p class="note {{ 'error' if msg_type == 'error' else 'done' }}">{{ msg | safe }}</p>{% endif %}
+{% if msg %}<p class="note {{ 'error' if msg_type == 'error' else 'done' }}">{{ msg }}</p>{% endif %}
 
 <div class="grid two">
   <form class="card" method="POST">

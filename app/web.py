@@ -31,6 +31,7 @@ def _vancouver_now() -> datetime:
 
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash, send_from_directory, abort, jsonify)
+from markupsafe import Markup
 from werkzeug.utils import secure_filename
 
 from . import config, database as db, eligibility as elig
@@ -534,13 +535,15 @@ def prof_settings(token):
                         db.delete_eligible(sno)
                         removed.append(f"{row['student_name']} ({sno})")
 
+                # The line breaks are the only markup; Markup.format escapes every value put into it, so a roster
+                # name is shown as text. Plain strings (the error below) are escaped by the template.
                 if removed:
-                    msg = (f"✅ Thresholds saved — Min grade: {g}%, Min attendance: {a}%.<br>"
-                           f"🗑 Removed {len(removed)} student(s) who no longer qualify:<br>"
-                           + "<br>".join(f"&nbsp;&nbsp;• {r}" for r in removed))
+                    msg = (Markup("✅ Thresholds saved — Min grade: {}%, Min attendance: {}%.<br>"
+                                  "🗑 Removed {} student(s) who no longer qualify:<br>").format(g, a, len(removed))
+                           + Markup("<br>").join(Markup("&nbsp;&nbsp;• {}").format(r) for r in removed))
                 else:
-                    msg = (f"✅ Thresholds saved — Min grade: {g}%, Min attendance: {a}%.<br>"
-                           f"All pending eligible students still qualify under the new thresholds.")
+                    msg = Markup("✅ Thresholds saved — Min grade: {}%, Min attendance: {}%.<br>"
+                                 "All pending eligible students still qualify under the new thresholds.").format(g, a)
             else:
                 msg = f"✅ Saved — Min grade: {g}%, Min attendance: {a}%"
 

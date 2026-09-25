@@ -61,6 +61,12 @@
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
   Appearance.bindSettings(document.getElementById('nl-settings-button'));
+  // A form with data-confirm asks before it submits. Names and file names go into that attribute, which the template
+  // HTML-escapes and this reads back as text; they are never written into an inline handler.
+  document.addEventListener('submit', function (e) {
+    var f = e.target, m = f && f.getAttribute && f.getAttribute('data-confirm');
+    if (m !== null && m !== undefined && !window.confirm(m)) e.preventDefault();
+  });
   document.querySelector('.skip').addEventListener('click', function (e) {
     e.preventDefault();
     var h = document.querySelector('main h1') || document.getElementById('main');
