@@ -114,6 +114,9 @@ input:disabled,select:disabled{color:var(--text-disabled);background:var(--surfa
 .btn-icon{padding:var(--space-2);min-width:var(--control-h)}
 .btn-wide{width:100%;min-height:var(--touch-min);font-size:var(--text-md)}
 .topbar .btn-primary{background:var(--on-band);border-color:var(--on-band);color:var(--band)}
+/* a disabled primary on the band keeps the disabled look: the band rule above has the same weight as .btn[disabled]
+   and comes later, so without this it would paint a disabled button like a live one (hover too) */
+.topbar .btn.btn-primary[disabled]{color:var(--text-disabled);background:var(--neutral-tint);border-color:var(--border)}
 .topbar .btn-ghost{color:var(--on-band)}
 .actions{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;margin-top:var(--space-5)}
 @media (hover:hover) and (pointer:fine){
