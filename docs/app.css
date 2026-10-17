@@ -4,7 +4,12 @@
    palettes --accent is the band colour itself. Two audiences share this sheet: a student on a phone who fills one
    form, and a professor at a desk reading tables. */
 
-/* ===== Fallback faces: until the web fonts load (or if they never do), system fonts are scaled to the measured widths so line lengths and column widths do not jump ===== */
+/* ===== Self-hosted brand faces; OFL licences are alongside the font files ===== */
+@font-face{font-family:Fraunces;src:url("fonts/fraunces.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:Inter;src:url("fonts/inter.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Space Mono";src:url("fonts/space-mono.woff2") format("woff2");font-weight:400;font-display:swap}
+
+/* ===== Fallback faces: system fonts are scaled to approximate the web fonts while they load ===== */
 @font-face{font-family:"Fraunces Fallback";src:local("Georgia"),local("Times New Roman");size-adjust:93.3%}
 @font-face{font-family:"Fraunces Fallback";src:local("Georgia Bold"),local("Georgia-Bold"),local("Times New Roman Bold");font-weight:600 700;size-adjust:92.3%}
 @font-face{font-family:"Inter Fallback";src:local("Helvetica Neue"),local("Arial"),local("Segoe UI");size-adjust:106.5%}
