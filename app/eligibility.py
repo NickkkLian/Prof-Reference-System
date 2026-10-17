@@ -34,6 +34,7 @@ def check(student_number: str, grade=None, grade_source="submitted"):
         grade_source=grade_source,
         identifiers=identifiers,
         att_results=att_results,
+        attendance_missing=any(rate is None for rate in att_results.values()),
         in_db=in_db,
         grade_ok=grade_ok,
         att_ok=att_ok,

@@ -28,7 +28,7 @@
       {% elif r.grade_source == 'database' %}<span class="hint">(from the course records)</span>{% endif %}</span>
     </li>
     <li class="{{ '' if r.att_ok else 'short' }}">
-      <span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment — {{ 'met' if r.att_ok else 'not met' }}</span>
+      <span>Attendance at least {{ '%g' % r.min_att }}% in every enrolment — {{ 'met' if r.att_ok else 'cannot confirm attendance: the record is incomplete' if r.attendance_missing else 'not met' }}</span>
     </li>
   </ul>
   <p class="hint" style="margin-top:var(--space-4)">This page shows no names or figures from the professor's records.

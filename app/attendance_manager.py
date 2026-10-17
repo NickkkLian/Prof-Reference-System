@@ -1,4 +1,5 @@
 import os, re
+from math import isfinite
 from openpyxl import load_workbook
 from . import config, database as db
 
@@ -94,10 +95,12 @@ def parse_roster_file(filepath, course=None, section=None, year=None, term=None)
 
         abs_raw = g("%abs")
         try:
-            av = float(abs_raw) if abs_raw not in (None, "") else 0.0
+            av = float(abs_raw)
+            if not isfinite(av):
+                raise ValueError
             if av > 1.0: av /= 100.0
         except (ValueError, TypeError):
-            av = 0.0
+            av = None
 
         grade_raw = g("grade")
         try:
@@ -115,8 +118,8 @@ def parse_roster_file(filepath, course=None, section=None, year=None, term=None)
             "student_name":        f"{fn} {ln}".strip(),
             "first_name":          fn,
             "last_name":           ln,
-            "absence_rate_pct":    round(av * 100, 2),
-            "attendance_rate_pct": round((1.0 - av) * 100, 2),
+            "absence_rate_pct":    round(av * 100, 2) if av is not None else None,
+            "attendance_rate_pct": round((1.0 - av) * 100, 2) if av is not None else None,
             "grade":               grade,
             "source_file":         os.path.basename(filepath),
         })

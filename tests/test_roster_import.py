@@ -73,3 +73,22 @@ def test_the_import_writes_what_the_rule_reads(tmp_path, data_dir):
     short = eligibility.check("10000002", grade=91.0)
     assert good["eligible"] is True
     assert short["att_ok"] is False and short["eligible"] is False      # 60% attendance
+
+
+@pytest.mark.parametrize("absence", [None, "n/a", "   ", "NaN", "inf", "-inf"],
+                         ids=["blank", "text", "whitespace", "nan", "infinity", "negative-infinity"])
+def test_missing_or_unreadable_absence_cannot_qualify(tmp_path, data_dir, absence):
+    from app import database as db, eligibility
+
+    path = roster(tmp_path / "incomplete.xlsx", ["Student #", "First Name", "Last Name", "%Abs", "Grade"],
+                  [["10000001", "Alice", "Chen", absence, 91.0], ["10000002", "Bo", "Li", 0, 91.0]])
+    am.import_file(path, course="DEMO 310", section="101", year="2025", term="Fall", verbose=False)
+
+    result = eligibility.check("10000001", grade=91.0)
+    assert result["att_ok"] is False and result["eligible"] is False
+    record = db.get_enrolments_by_student("10000001")[0]
+    assert record["absence_rate_pct"] is None
+    assert record["attendance_rate_pct"] is None
+    assert list(result["att_results"].values()) == [None]
+    # A recorded zero is still complete attendance, unlike a blank cell.
+    assert eligibility.check("10000002", grade=91.0)["eligible"] is True

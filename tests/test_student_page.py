@@ -47,6 +47,20 @@ def test_the_short_condition_is_named_without_its_figure(client, enrol):
         assert roster_detail not in html, roster_detail
 
 
+def test_missing_attendance_explains_the_incomplete_record_without_roster_details(client, enrol):
+    from app import database as db
+
+    enrol("10000103", "DEMO 310", attendance_pct=None, grade=88.5, name="Casey Example")
+    enrol("10000103", "DEMO 320", attendance_pct=96.0, grade=88.5, name="Casey Example")
+    html = submit(client, "10000103").get_data(as_text=True)
+    assert "You do not qualify yet." in html
+    assert short_conditions(html) == ["Attendance"]
+    assert "cannot confirm attendance: the record is incomplete" in html
+    assert db.count_eligible() == 0
+    for roster_detail in ("Casey", "Example", "88.5", "96.0", "DEMO310", "DEMO 310", "DEMO320", "DEMO 320"):
+        assert roster_detail not in html, roster_detail
+
+
 def test_a_number_not_on_the_roster_says_so_and_nothing_else(client, data_dir):
     html = submit(client, "10000999")
     # no grade in the records and none in a blank PDF: the student is asked to type it
