@@ -36,7 +36,7 @@
     </label>
     <label class="field">
       <span class="field-label">Grade override (optional)</span>
-      <input name="manual_grade" inputmode="decimal" placeholder="blank = the grade in the roster">
+      <input name="manual_grade" inputmode="decimal" placeholder="Leave blank for roster grade">
     </label>
     <button class="btn btn-primary" type="submit">Check</button>
 
@@ -54,7 +54,7 @@
 <section>
   <h2>Recently checked eligible</h2>
   {% if recent %}
-  <div class="tablewrap" tabindex="0" role="region" aria-label="Recently checked eligible students" style="margin-top:var(--space-4)">
+  <div class="tablewrap" tabindex="-1" role="region" aria-label="Recently checked eligible students" style="margin-top:var(--space-4)">
     <table class="data">
       <thead><tr><th>Student #</th><th>Name</th><th class="num">Grade</th><th>Checked</th></tr></thead>
       <tbody>

@@ -64,6 +64,13 @@
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
   document.querySelectorAll('table.data').forEach(function (table) {
+    var wrapper = table.closest('.tablewrap');
+    var syncTableFocus = function () {
+      var style = getComputedStyle(wrapper);
+      var horizontal = ['auto', 'scroll'].includes(style.overflowX) && wrapper.scrollWidth > wrapper.clientWidth + 1;
+      var vertical = ['auto', 'scroll'].includes(style.overflowY) && wrapper.scrollHeight > wrapper.clientHeight + 1;
+      wrapper.tabIndex = horizontal || vertical ? 0 : -1;
+    };
     var headings = Array.from(table.tHead.rows[0].cells, function (cell) { return cell.textContent.trim(); });
     table.tHead.classList.add('record-head');
     Array.from(table.tBodies).forEach(function (body) {
@@ -78,6 +85,11 @@
         });
       });
     });
+    var tableSize = new ResizeObserver(syncTableFocus);
+    tableSize.observe(wrapper);
+    tableSize.observe(table);
+    document.fonts.ready.then(syncTableFocus);
+    syncTableFocus();
   });
   var navigation = document.querySelector('.app-navigation');
   if (navigation) {

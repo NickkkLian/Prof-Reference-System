@@ -14,7 +14,7 @@
 <section>
   <h2>{{ title }} ({{ files | length }})</h2>
   {% if files %}
-  <div class="tablewrap" tabindex="0" role="region" aria-label="{{ title }}" style="margin-top:var(--space-4)">
+  <div class="tablewrap" tabindex="-1" role="region" aria-label="{{ title }}" style="margin-top:var(--space-4)">
     <table class="data">
       <thead><tr><th>File</th><th class="num">Size</th><th>Uploaded</th><th>Download</th><th>Delete</th></tr></thead>
       <tbody>
@@ -23,7 +23,7 @@
           <td class="mono">{{ f.name }}</td>
           <td class="num">{{ f.size }}</td>
           <td>{{ f.modified }}</td>
-          <td><a class="btn btn-ghost" href="{{ url_for(dl, token=token, filename=f.name) }}">Download</a></td>
+          <td class="download-cell"><a class="document-link" href="{{ url_for(dl, token=token, filename=f.name) }}">Download</a></td>
           <td><form method="POST" action="{{ url_for(rm, token=token, filename=f.name) }}"
                     data-confirm="Delete {{ f.name }}? The file is removed from this machine.">
               <button class="btn btn-danger" type="submit">Delete</button></form></td>

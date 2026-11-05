@@ -124,7 +124,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 .app-footer dt { font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .app-footer dd { margin: 0; }
 .data .cell-label { display: none; }
-.document-cell .document-link { min-height: 0; padding: 0; font-weight: 400; line-height: 1.5; }
+.document-link { display: inline-block; min-height: 0; padding: 0; color: var(--accent); font-weight: 700; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; }
 @media(min-width:701px) { .app-navigation > summary { display: none; } }
 @media(max-width:1000px) { .dashboard-layout { grid-template-columns: minmax(0,1.8fr) minmax(220px,1fr); gap: 20px; } }
 @media(max-width:700px) {
@@ -138,7 +138,9 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
   .data .cell-label { display: block; color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.5; margin: 0 0 4px; }
   .data .student-cell > .cell-label { display: none; }
   .data .btn { max-width: 100%; }
-  .document-cell .document-link { min-height: 40px; }
+  .document-link { min-height: 40px; }
+  .data td[data-label="Download"] > .cell-label,.data td[data-label="Delete"] > .cell-label { display: none; }
+  .download-cell .document-link { display: inline-flex; align-items: center; line-height: 1.4; }
   .topbar { padding: 12px 16px; gap: 12px; }
   .workspace-label { display: none; }
   .topbar #theme { margin-left: auto; }

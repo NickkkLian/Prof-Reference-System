@@ -46,7 +46,7 @@
       <label class="field">
         <span class="field-label">Brevo API key</span>
         <input type="password" name="brevo_api_key" value="" autocomplete="off"
-               placeholder="{{ 'a key is saved — type a new one to replace it' if brevo_key_saved else 'not set' }}">
+               placeholder="{{ 'a key is saved' if brevo_key_saved else 'not set' }}">
         <p class="hint">Brevo's free tier sends 300 mails a day. Leave blank to keep the saved key.</p>
       </label>
       <button class="btn btn-primary" type="submit">Save</button>

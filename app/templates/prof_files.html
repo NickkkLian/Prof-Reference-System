@@ -9,7 +9,7 @@
 </div>
 
 {% if disk_files %}
-<div class="tablewrap" tabindex="0" role="region" aria-label="Roster files">
+<div class="tablewrap" tabindex="-1" role="region" aria-label="Roster files">
   <table class="data">
     <thead><tr><th>File</th><th class="num">Size</th><th>Uploaded</th><th class="num">Enrolments</th>
                <th class="num">Students</th><th>Last import</th><th>Delete</th></tr></thead>
@@ -47,7 +47,7 @@
   <h2>In the database, but the file is gone</h2>
   <p class="hint">These enrolments came from files that are no longer on this machine. Deleting the record removes
      those enrolments too.</p>
-  <div class="tablewrap" tabindex="0" role="region" aria-label="Enrolments whose file is missing" style="margin-top:var(--space-4)">
+  <div class="tablewrap" tabindex="-1" role="region" aria-label="Enrolments whose file is missing" style="margin-top:var(--space-4)">
     <table class="data">
       <thead><tr><th>Source file</th><th class="num">Enrolments</th><th class="num">Students</th><th>Delete</th></tr></thead>
       <tbody>
