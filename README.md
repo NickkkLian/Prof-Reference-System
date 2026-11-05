@@ -1,6 +1,6 @@
 # Letterkeep
 
-![Letterkeep](.github/header.png)
+![Letterkeep sample queue and letter notes](docs/screenshot-workspace.png)
 
 **Students check whether they qualify for a reference letter before they ask — the roster, the grades and the files never leave the professor's own machine.**
 
@@ -10,7 +10,7 @@ not reflected here.
 
 [![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png)
 
-**A one-page tour:** https://nickkklian.github.io/Prof-Reference-System/ — what it does and why, in a page. There is no hosted version to try: the roster, the grades and the files never leave the professor's machine, so the application runs on yours.
+**An interactive sample:** https://nickkklian.github.io/Prof-Reference-System/ — three fictional seed records, their course evidence and letter notes. Notes and written status last until reload. The expandable guide below the queue covers submissions, professor tools and setup. Run the full application on your own machine for your own roster, grades and files.
 
 ```bash
 python3 -m pip install -r requirements.txt
@@ -45,7 +45,7 @@ but no name, enrolment or figure from the roster: anyone who knows a student num
 | The student's answer | The professor's dashboard |
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"darkMode": false, "fontFamily": "Inter, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Helvetica, Arial", "primaryColor": "#dae7db", "mainBkg": "#dae7db", "primaryTextColor": "#1d1b24", "nodeTextColor": "#1d1b24", "textColor": "#1d1b24", "primaryBorderColor": "#2f5859", "nodeBorder": "#2f5859", "secondaryColor": "#fae8eb", "tertiaryColor": "#f7e9e8", "lineColor": "#5f7f76", "arrowheadColor": "#5f7f76", "defaultLinkColor": "#5f7f76", "edgeLabelBackground": "#fae8eb", "clusterBkg": "#f7e9e8", "clusterBorder": "#a8707a", "titleColor": "#7d2d44"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"darkMode": false, "fontFamily": "Instrument Sans, sans-serif", "primaryColor": "#dce6f1", "mainBkg": "#dce6f1", "primaryTextColor": "#23364a", "nodeTextColor": "#23364a", "textColor": "#23364a", "primaryBorderColor": "#435f7c", "nodeBorder": "#435f7c", "secondaryColor": "#edf1f6", "tertiaryColor": "#e7edf4", "lineColor": "#435f7c", "arrowheadColor": "#435f7c", "defaultLinkColor": "#435f7c", "edgeLabelBackground": "#edf1f6", "clusterBkg": "#e7edf4", "clusterBorder": "#cdd7e3", "titleColor": "#435f7c"}}}%%
 flowchart LR
   R[Roster .xlsx] -->|import| DB[(SQLite on this machine)]
   S[Student uploads<br/>transcript + letter] --> C{On the roster?<br/>Grade ≥ m?<br/>Attendance ≥ n<br/>in every enrolment?}
@@ -98,7 +98,7 @@ required column is refused and the message names what is missing.
 
 ```bash
 python3 -m pip install -r requirements.txt pytest
-python3 -m pytest tests -q       # 33 tests
+python3 -m pytest tests -q       # 41 tests
 python3 break_check.py           # breaks the rule six ways; each must be caught
 ```
 
@@ -162,7 +162,7 @@ run_web.py            server entry point
 run_desktop.py        desktop entry point (data folder beside the program)
 pyversion.py          the Python version both entry points check before importing anything
 break_check.py        breaks the rule six ways; each must be caught by its own test
-tests/                33 tests
+tests/                41 tests
 roster.spec           PyInstaller configuration for the desktop bundle
 ```
 

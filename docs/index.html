@@ -1,173 +1,43 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<script>/* appearance boot — runs before any stylesheet so the stored palette and light/dark apply on the first paint */(function(){try{var d=document.documentElement,L=window.localStorage,t=L.getItem('nl-theme'),s=L.getItem('nl-scheme');if(s===null){var o=L.getItem('theme')||L.getItem('qm-theme');if(o==='dark'||o==='light')s=o;}if(t==='paper'||t==='ink')d.setAttribute('data-theme',t);if(s==='dark'||s==='light')d.setAttribute('data-scheme',s);}catch(e){}})();</script>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Letterkeep — students check whether they qualify for a reference letter before they ask; the roster, the grades and the files never leave the professor's own machine. A Flask app for one course, with the rule under test.">
-<meta name="theme-color" content="#f7e9e8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#130e15" media="(prefers-color-scheme: dark)">
-<title>Letterkeep</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="design-tokens.css">
-<link rel="stylesheet" href="app.css">
-<style>
-/* the tour page is one column of alternating text and picture; everything else comes from the product's own sheet */
-.plate{background:var(--band);color:var(--on-band);padding:var(--space-6) var(--gutter) var(--space-5);border-bottom:1px solid var(--band-line);position:relative;z-index:1}
-/* the band keeps to the share the design system gives it (47% of a 1280x900 first screen = 427px, top bar included) */
-.plate .actions{margin-top:var(--space-4)}
-.plate .inner{max-width:var(--content-max);margin:0 auto}
-.plate h1{font-size:var(--text-4xl);font-variation-settings:"opsz" var(--opsz-display);letter-spacing:var(--tracking-display);color:var(--on-band);margin-top:var(--space-3);max-width:20ch}
-.plate .lede{margin-top:var(--space-3);color:var(--on-band-2);max-width:var(--measure);font-size:var(--text-lg);line-height:var(--leading-lede)}
-.plate .eyebrow{color:var(--on-band-2)}
-.plate .rule{width:56px;height:2px;background:var(--point);margin-top:var(--space-4);border-radius:1px}
-.plate .actions a.btn-primary{background:var(--on-band);border-color:var(--on-band);color:var(--band)}
-.plate .actions a:not(.btn){color:var(--on-band);font-size:var(--text-sm)}
-figure{margin:0}
-figure img{width:100%;height:auto;border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-1);background:var(--surface)}
-figure figcaption{margin-top:var(--space-3)}
-.shots{display:grid;gap:var(--space-6);margin-top:var(--space-5)}
-@media (min-width:900px){.shots.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.phone img{max-width:375px}
-.steps{list-style:none;margin:var(--space-5) 0 0;padding:0;display:grid;gap:var(--space-4);counter-reset:s}
-.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--space-4);align-items:start}
-.steps li::before{counter-increment:s;content:counter(s);display:flex;align-items:center;justify-content:center;
-  width:2rem;height:2rem;border-radius:50%;background:var(--accent-tint);color:var(--accent-tint-text);
-  font:var(--weight-semibold) var(--text-sm)/1 var(--font-sans)}
-.steps p{color:var(--text-2);max-width:var(--measure)}
-pre{margin:var(--space-4) 0 0;padding:var(--space-4);background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);overflow-x:auto;font:var(--weight-regular) var(--text-sm)/1.7 var(--font-mono)}
-</style>
-</head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<header class="topbar">
-  <a class="brand" href="./" aria-label="Letterkeep home">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="14" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
-    <b>Letterkeep</b><span>Reference-letter eligibility for one course — the roster stays on the professor's machine.</span>
-  </a>
-  <span class="pill" title="This page is a tour: the app is a Flask server you run yourself, so there is nothing to try online.">Local app<span class="long"> · nothing hosted</span></span>
-  <button class="btn btn-ghost btn-icon" id="theme" aria-label="Dark mode" aria-pressed="false" title="Dark mode"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
-  <button type="button" class="btn btn-ghost btn-icon" id="nl-settings-button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.34 5.10L10.58 2.51L13.42 2.51L13.66 5.10A7.1 7.1 0 0 1 15.71 5.95L17.71 4.28L19.72 6.29L18.05 8.29A7.1 7.1 0 0 1 18.90 10.34L21.49 10.58L21.49 13.42L18.90 13.66A7.1 7.1 0 0 1 18.05 15.71L19.72 17.71L17.71 19.72L15.71 18.05A7.1 7.1 0 0 1 13.66 18.90L13.42 21.49L10.58 21.49L10.34 18.90A7.1 7.1 0 0 1 8.29 18.05L6.29 19.72L4.28 17.71L5.95 15.71A7.1 7.1 0 0 1 5.10 13.66L2.51 13.42L2.51 10.58L5.10 10.34A7.1 7.1 0 0 1 5.95 8.29L4.28 6.29L6.29 4.28L8.29 5.95A7.1 7.1 0 0 1 10.34 5.10Z"/><circle cx="12" cy="12" r="3"/></svg></button>
-  <a class="btn btn-ghost gh" href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">GitHub</a>
-</header>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A sample reference-letter queue, course evidence and notes. Run the full local application with your own roster."><title>Letterkeep — Reference letters</title><script src="theme.js"></script><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="style.css"></head>
+<body data-project="letterkeep"><a class="skip" href="#main">Skip to work</a>
 
-<section class="plate" aria-labelledby="h">
-  <div class="inner">
-    <span class="eyebrow">Flask · SQLite · one course · built for a faculty client</span>
-    <h1 id="h">Students check whether they qualify before they ask.</h1>
-    <p class="lede">Three conditions the professor states once — on the roster, grade at or above the threshold,
-      attendance at or above it in every enrolment. The roster, the grades and the uploaded files stay on the
-      professor's own machine; this page is a tour, because there is nothing hosted to try.</p>
-    <div class="rule" aria-hidden="true"></div>
-    <div class="actions">
-      <a class="btn btn-primary" href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">Read the code</a>
-      <a href="#run">Run it in a minute</a>
-    </div>
-  </div>
-</section>
-
-<main id="main">
-  <section>
-    <h2>What a student sees</h2>
-    <p class="intro">The conditions are stated before the upload form, not discovered afterwards. On a phone, because
-      that is where a student checks this.</p>
-    <div class="shots two">
-      <figure class="phone">
-        <img src="screenshot-student.png" alt="The student page on a phone: the three conditions, then fields for the student number, the transcript and the letter of interest." width="375" height="812">
-        <figcaption class="caption">The student page at 375px.</figcaption>
-      </figure>
-      <figure>
-        <img src="screenshot-result.png" alt="The result page: a sentence saying the student qualifies, then which of the three conditions are met." width="1280" height="900">
-        <figcaption class="caption">The answer, then which condition is met. No names, enrolments or figures from
-          the roster: anyone who knows a student number can open this page.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section>
-    <h2>What the professor sees</h2>
-    <div class="shots two">
-      <figure>
-        <img src="screenshot-dashboard.png" alt="The professor's dashboard: counts for enrolments, students, courses and eligible students; a form to check one student; recent checks." width="1280" height="900">
-        <figcaption class="caption">The dashboard: what the roster holds, and a check for a student who wrote
-          directly.</figcaption>
-      </figure>
-      <figure>
-        <img src="screenshot-eligible.png" alt="The eligible list: students waiting for a letter, with grade, source of the grade, enrolments and a download for their letter of interest." width="1280" height="900">
-        <figcaption class="caption">Who is waiting for a letter, and who already has one.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <section>
-    <h2>The rule</h2>
-    <p class="intro">Forty-five lines, and the part that matters is the third condition: attendance is checked in
-      every enrolment, not on average.</p>
-    <ol class="steps">
-      <li><div><h3>On the roster</h3><p>The student number appears in a roster file the professor imported. Course,
-        section, year and term come from the import form, so any of the usual column spellings work.</p></div></li>
-      <li><div><h3>Grade at or above the threshold</h3><p>Default 80%. Read from the transcript PDF when it can be,
-        typed by the student when it cannot, or overridden by the professor — and which of the three happened is
-        recorded beside the result.</p></div></li>
-      <li><div><h3>Attendance at or above the threshold, everywhere</h3><p>Default 75%. A student in two courses with
-        96% in one and 60% in the other does not qualify. A row with no attendance figure is not a pass.</p></div></li>
-    </ol>
-  </section>
-
-  <section id="run">
-    <h2>Run it in a minute</h2>
-    <p class="intro">No licence, no account, no network: the demo data is fifteen made-up students in two courses.</p>
-<pre><code>git clone https://github.com/NickkkLian/Prof-Reference-System.git
+<header data-header-form="queue-switch"><p class="wordmark">Letterkeep</p><nav class="folders segmented" aria-label="Letter folders"><button id="waiting-folder" aria-current="page">Waiting <span id="waiting-count">3</span></button><button id="written-folder">Written <span id="written-count">0</span></button></nav><p class="local-copy">Sample faculty workspace</p></header>
+<div class="desk working-object" data-alignment="queue-and-record-two-pane">
+ <aside class="inbox"><div class="inbox-heading"><h2>Letters to prepare</h2><p id="queue-summary">3 waiting for a letter</p></div><div id="student-list"></div><p class="queue-note">Roster order <span class="key-hint">J / K to move</span></p></aside>
+ <main id="main" class="student-record panel raised"><section id="empty-record" hidden><h1>No letters written yet</h1><p>Choose Waiting to open a record.</p></section><div class="record-content"><div class="student-heading"><div><h1 id="student-name">Alice Chen</h1><p id="student-number">Course 310, section 101</p></div><span class="badge success">Conditions met</span></div><section class="metrics"><div class="metric"><span>Overall grade</span><strong id="grade">88.5%</strong><p>80% required</p><div class="metric-track"><span id="grade-bar"></span><i style="left:80%"></i></div></div><div class="metric"><span>Attendance</span><strong id="attendance">98%</strong><p>75% required</p><div class="metric-track"><span id="attendance-bar"></span><i style="left:75%"></i></div></div></section><section class="documents"><h3>Documents</h3><div class="file-chips"><span>Transcript <span class="badge">No file</span></span><span>Letter of interest <span class="badge">No file</span></span></div><p>The public sample includes course records only.</p></section><div class="record-actions"><button class="primary" data-main-action id="start-notes">Start letter notes</button><button class="ghost" id="mark-written">Mark letter written</button></div><section id="notes-section"><div class="notes-heading"><label for="notes">Notes for the letter</label><span>Held until reload</span></div><div class="prompt-chips"><button data-prompt="How I know the student">How I know the student</button><button data-prompt="Work I observed">Work I observed</button><button data-prompt="Evidence of readiness">Evidence of readiness</button></div><textarea id="notes" rows="5" aria-label="Letter notes" placeholder="Choose a prompt to begin your notes"></textarea></section><p id="record-status" role="status">Letter waiting to be written.</p></div></main>
+</div>
+<section class="project-guide" aria-labelledby="guide-title">
+  <h2 id="guide-title">Run Letterkeep with your own roster</h2>
+  <p>This workspace uses three fictional records from the application's seed data and eligibility engine. Notes and written status last until reload. The full Flask application runs on your machine.</p>
+  <div class="guide-grid">
+    <details><summary>Student submission and result</summary>
+      <p>The student sees the conditions before submitting their student number, transcript PDF, letter of interest and consent. A PDF grade is used when available, with manual entry as the fallback. The result shows which conditions are met, with roster names and enrolments kept private.</p>
+      <div class="guide-shots"><figure><img src="screenshot-student.png" alt="Student submission form in the local app" loading="lazy"><figcaption>Student submission</figcaption></figure><figure><img src="screenshot-result.png" alt="Eligibility result in the local app" loading="lazy"><figcaption>Result and conditions</figcaption></figure></div>
+    </details>
+    <details><summary>Professor tools</summary>
+      <p>The local professor dashboard has counts, recent checks and a quick student check. Eligible students can be marked written, moved back or removed. Uploaded documents can be downloaded. Roster, import, roster files, documents and threshold/notification settings retain their own pages.</p>
+      <div class="guide-shots"><figure><img src="screenshot-dashboard.png" alt="Professor dashboard in the local app" loading="lazy"><figcaption>Dashboard and recent checks</figcaption></figure><figure><img src="screenshot-eligible.png" alt="Eligible student list in the local app" loading="lazy"><figcaption>Waiting and written letters</figcaption></figure></div>
+    </details>
+    <details><summary>The eligibility rule</summary>
+      <ol><li>The student number must appear in an imported roster.</li><li>The grade must meet the threshold, initially 80%. Its source is recorded, including professor overrides.</li><li>Attendance must meet the threshold, initially 75%, in every enrolment. A missing rate or one course below the threshold fails this condition.</li></ol>
+      <p>Roster imports accept common column spellings in any order and case. Course, section, year and term come from the import form. Absence values of 0.04 and 4 both mean four percent.</p>
+    </details>
+    <details id="run"><summary>Run locally</summary>
+      <pre><code>git clone https://github.com/NickkkLian/Prof-Reference-System.git
 cd Prof-Reference-System
 python3 -m pip install -r requirements.txt
 python3 run_web.py --seed</code></pre>
-    <p class="hint" style="margin-top:var(--space-3)">It prints the student page and the professor's address — the
-      same page plus a token, which is the only key to the professor's side. The server binds this machine only
-      unless <code>--host</code> says otherwise, and listens on 5001, because on macOS 5000 belongs to AirPlay.
-      Python 3.10 or newer: macOS ships 3.9 as <code>/usr/bin/python3</code>, and the app says so and stops rather
-      than failing inside an import.</p>
-    <p class="intro" style="margin-top:var(--space-5)">The rule is under test, and the tests have to be able to
-      fail:</p>
-<pre><code>python3 -m pytest tests -q    # 33 tests
-python3 break_check.py        # six breaks, each caught by its own test</code></pre>
-  </section>
-</main>
+      <p>Python 3.10 or newer. The seed contains fifteen fictional students in two courses. The server listens on this machine at port 5001 and prints separate student and professor addresses. The professor address is the access key. SQLite, rosters and uploads stay on the machine running the app.</p>
+    </details>
+    <details><summary>Checks, scope and licence</summary>
+      <pre><code>python3 -m pytest tests -q
+python3 break_check.py</code></pre>
+      <p>This public v1 snapshot was built for a faculty client whose name is withheld. The version in use is maintained privately. Desktop packaging, scanned-transcript OCR and actual email delivery require separate checks. Notifications send only when both an address and an API key are configured.</p>
+      <p><a href="https://github.com/NickkkLian/Prof-Reference-System">Source and full documentation</a> · <a href="https://github.com/NickkkLian/Prof-Reference-System/blob/main/LICENSE">MIT licence</a></p>
+    </details>
+  </div>
+</section>
+<footer><span>Course thresholds stay beside the student’s results</span><a href="https://github.com/NickkkLian/Prof-Reference-System">Project information</a></footer><div class="toast" id="undo-toast" hidden role="status"><span>Letter marked written</span><button id="undo">Undo</button></div>
 
-<footer class="honest">
-  <dl class="inner">
-    <div><dt>What this is</dt>
-    <dd>A course-administration tool built for a faculty client (name withheld), kept here as a public v1 snapshot;
-      the version in use is maintained privately. It answers one question for one course.</dd></div>
-    <div><dt>Not verified here</dt>
-    <dd>The PyInstaller desktop bundle (never built on the machine this version was written on) · OCR for scanned
-      transcripts (needs the tesseract binary) · e-mail delivery (the notifier is tested with the request captured,
-      never sent) · the demo figures, which are made up.</dd></div>
-    <div><dt>Source</dt>
-    <dd><a href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">github.com/NickkkLian/Prof-Reference-System</a>
-      · MIT · Python 3.10+</dd></div>
-  </dl>
-</footer>
-<script src="appearance.js"></script>
-<script>
-  Appearance.bindToggle(document.getElementById('theme'));
-  Appearance.bindSettings(document.getElementById('nl-settings-button'));
-  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]:not(.skip)'), function (a) {
-    a.addEventListener('click', function () {
-      var target = document.getElementById(a.getAttribute('href').slice(1));
-      if (!target) return;
-      var h = target.matches('h1, h2, h3') ? target : (target.querySelector('h2, h3') || target);
-      if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
-      setTimeout(function () { h.focus(); }, 0);
-    });
-  });
-  document.querySelector('.skip').addEventListener('click', function (e) {
-    e.preventDefault();
-    var h = document.querySelector('main h2') || document.getElementById('main');
-    if (h && !h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
-    h.focus();
-  });
-</script>
-</body>
-</html>
+<script src="base.js"></script><script src="data.js"></script><script src="app.js"></script></body></html>

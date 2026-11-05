@@ -1,0 +1,41 @@
+/* Approved Letterkeep colours and type, mapped to the existing Flask components. */
+:root[data-theme] {
+  --font-sans: var(--body); --font-display: var(--display); --font-mono: var(--body);
+  --bg: var(--base); --surface-2: var(--soft); --surface-hover: var(--selection);
+  --text-2: var(--muted); --text-3: var(--muted); --text-disabled: var(--muted);
+  --band: var(--base); --on-band: var(--text); --on-band-2: var(--muted); --band-line: var(--line);
+  --nav-surface: var(--base); --on-nav: var(--text); --on-nav-2: var(--muted); --nav-line: var(--line); --nav-selected: var(--selection);
+  --accent-text: var(--accent); --accent-hover: var(--accent); --point: var(--accent); --focus: var(--accent);
+  --border: var(--line); --border-input: var(--line); --border-strong: var(--line); --hairline: var(--line);
+  --neutral-tint: var(--soft); --info: var(--accent); --info-tint: var(--soft); --info-tint-text: var(--text);
+  --success: #256343; --success-tint: #e5f3e9; --success-tint-text: #256343;
+  --warning: #795015; --warning-tint: #fff1d6; --warning-tint-text: #795015;
+  --danger: #a12c38; --danger-tint: #fce8ea; --danger-tint-text: #a12c38;
+  --selection-bg: var(--selection); --on-band-warning: var(--accent);
+  --text-2xs: 12px; --text-xs: 12px; --text-sm: 14px; --text-md: 16px; --text-lg: 20px; --text-xl: 24px; --text-2xl: 40px; --text-3xl: 40px;
+  --grain: none; --radius-sm: 8px; --radius-md: 10px; --display-weight: 700;
+  --shadow-1: 0 8px 32px var(--shadow-color); --tracking-caps: normal;
+}
+:root[data-theme=dark] {
+  --on-accent: var(--base);
+  --success: #a4dabb; --success-tint: #1c392a; --success-tint-text: #a4dabb;
+  --warning: #f1cf90; --warning-tint: #46381e; --warning-tint-text: #f1cf90;
+  --danger: #f6b0b9; --danger-tint: #4c2630; --danger-tint-text: #f6b0b9;
+}
+.topbar { position: relative; padding-block: 16px; border: 0; }
+.topbar .brand svg { display: none; }
+.topbar #theme { display: inline-flex; }
+.topbar .brand b { font-size: 24px; }
+.topbar .brand span { white-space: normal; }
+.subnav { position: relative; top: 0; border: 0; padding-block: 4px; }
+.subnav a { border: 0; border-radius: 8px; }
+.subnav a[aria-current=page] { background: var(--selection); }
+.tile span,table.data thead th,.honest dt,.eyebrow { text-transform: none; letter-spacing: normal; }
+.honest { border: 0; }
+.tiles { grid-template-columns: repeat(auto-fit,minmax(132px,max-content)); }
+.tile { min-width: 132px; }
+.facts li { justify-content: flex-start; gap: 16px; }
+.facts li > span { min-width: 96px; }
+.grid.two { align-items: start; }
+.topbar :focus-visible,.subnav :focus-visible,.honest :focus-visible { outline-color: var(--accent); }
+@media(max-width:700px) { h1 { font-size: 32px; } .topbar .brand b { font-size: 24px; } }

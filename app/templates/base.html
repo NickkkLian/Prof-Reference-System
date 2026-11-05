@@ -1,17 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
-<script>/* appearance boot — runs before any stylesheet so the stored palette and light/dark apply on the first paint */(function(){try{var d=document.documentElement,L=window.localStorage,t=L.getItem('nl-theme'),s=L.getItem('nl-scheme');if(s===null){var o=L.getItem('theme')||L.getItem('qm-theme');if(o==='dark'||o==='light')s=o;}if(t==='paper'||t==='ink')d.setAttribute('data-theme',t);if(s==='dark'||s==='light')d.setAttribute('data-scheme',s);}catch(e){}})();</script>
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="{{ app_name }} — students check whether they qualify for a reference letter before they ask; the roster, the grades and the files stay on the professor's own machine.">
-<meta name="theme-color" content="#f7e9e8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#130e15" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#edf1f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17232f" media="(prefers-color-scheme: dark)">
 <title>{% block title %}{{ app_name }}{% endblock %}</title>
 <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='design-tokens.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='letterkeep.css') }}">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -22,7 +25,6 @@
   </a>
   {% if token %}<span class="pill" title="You are on the professor's side of the app; the address carries the token that opens it.">Professor<span class="long"> view</span></span>{% else %}<span class="spacer"></span>{% endif %}
   <button class="btn btn-ghost btn-icon" id="theme" aria-label="Dark mode" aria-pressed="false" title="Dark mode"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
-  <button type="button" class="btn btn-ghost btn-icon" id="nl-settings-button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.34 5.10L10.58 2.51L13.42 2.51L13.66 5.10A7.1 7.1 0 0 1 15.71 5.95L17.71 4.28L19.72 6.29L18.05 8.29A7.1 7.1 0 0 1 18.90 10.34L21.49 10.58L21.49 13.42L18.90 13.66A7.1 7.1 0 0 1 18.05 15.71L19.72 17.71L17.71 19.72L15.71 18.05A7.1 7.1 0 0 1 13.66 18.90L13.42 21.49L10.58 21.49L10.34 18.90A7.1 7.1 0 0 1 8.29 18.05L6.29 19.72L4.28 17.71L5.95 15.71A7.1 7.1 0 0 1 5.10 13.66L2.51 13.42L2.51 10.58L5.10 10.34A7.1 7.1 0 0 1 5.95 8.29L4.28 6.29L6.29 4.28L8.29 5.95A7.1 7.1 0 0 1 10.34 5.10Z"/><circle cx="12" cy="12" r="3"/></svg></button>
 </header>
 {% if token %}
 <nav class="subnav" aria-label="Professor pages">
@@ -54,10 +56,9 @@
     <dd><a href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">github.com/NickkkLian/Prof-Reference-System</a> · MIT · <code>python3 run_web.py --seed</code></dd></div>
   </dl>
 </footer>
-<script src="{{ url_for('static', filename='appearance.js') }}"></script>
+<script src="{{ url_for('static', filename='theme-control.js') }}"></script>
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
-  Appearance.bindSettings(document.getElementById('nl-settings-button'));
   // A form with data-confirm asks before it submits. Names and file names go into that attribute, which the template
   // HTML-escapes and this reads back as text; they are never written into an inline handler.
   document.addEventListener('submit', function (e) {
