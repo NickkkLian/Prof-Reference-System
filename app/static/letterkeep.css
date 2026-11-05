@@ -123,9 +123,22 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 .app-footer .inner { display: grid; gap: 16px; margin-top: 16px; font-size: 14px; }
 .app-footer dt { font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .app-footer dd { margin: 0; }
+.data .cell-label { display: none; }
+.document-cell .document-link { min-height: 0; padding: 0; font-weight: 400; line-height: 1.5; }
 @media(min-width:701px) { .app-navigation > summary { display: none; } }
 @media(max-width:1000px) { .dashboard-layout { grid-template-columns: minmax(0,1.8fr) minmax(220px,1fr); gap: 20px; } }
 @media(max-width:700px) {
+  .tablewrap { overflow: visible; width: 100%; background: transparent; border-radius: 0; }
+  table.data,table.data tbody { display: block; width: 100%; }
+  table.data .record-head { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  table.data tr { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 16px; background: var(--surface); border-radius: 10px; margin-bottom: 12px; }
+  table.data td { display: block; min-width: 0; max-width: none; padding: 0; border: 0; white-space: normal !important; overflow-wrap: anywhere; text-align: left !important; }
+  table.data td:first-child,table.data td[data-label="Source file"],table.data .evidence-cell { grid-column: 1 / -1; }
+  table.data td:first-child { font-size: 16px; font-weight: 700; }
+  .data .cell-label { display: block; color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.5; margin: 0 0 4px; }
+  .data .student-cell > .cell-label { display: none; }
+  .data .btn { max-width: 100%; }
+  .document-cell .document-link { min-height: 40px; }
   .topbar { padding: 12px 16px; gap: 12px; }
   .workspace-label { display: none; }
   .topbar #theme { margin-left: auto; }

@@ -14,9 +14,9 @@
 <section>
   <h2>{{ title }} ({{ files | length }})</h2>
   {% if files %}
-  <div class="tablewrap" tabindex="0" role="region" aria-label="{{ title }}, scrolls sideways" style="margin-top:var(--space-4)">
+  <div class="tablewrap" tabindex="0" role="region" aria-label="{{ title }}" style="margin-top:var(--space-4)">
     <table class="data">
-      <thead><tr><th>File</th><th class="num">Size</th><th>Uploaded</th><th>Open</th><th>Delete</th></tr></thead>
+      <thead><tr><th>File</th><th class="num">Size</th><th>Uploaded</th><th>Download</th><th>Delete</th></tr></thead>
       <tbody>
         {% for f in files %}
         <tr>

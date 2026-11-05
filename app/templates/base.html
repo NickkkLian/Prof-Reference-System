@@ -63,6 +63,22 @@
 <script src="{{ url_for('static', filename='theme-control.js') }}"></script>
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
+  document.querySelectorAll('table.data').forEach(function (table) {
+    var headings = Array.from(table.tHead.rows[0].cells, function (cell) { return cell.textContent.trim(); });
+    table.tHead.classList.add('record-head');
+    Array.from(table.tBodies).forEach(function (body) {
+      Array.from(body.rows).forEach(function (row) {
+        Array.from(row.cells).forEach(function (cell, index) {
+          var label = document.createElement('span');
+          label.className = 'cell-label';
+          label.setAttribute('aria-hidden', 'true');
+          label.textContent = headings[index];
+          cell.dataset.label = headings[index];
+          cell.prepend(label);
+        });
+      });
+    });
+  });
   var navigation = document.querySelector('.app-navigation');
   if (navigation) {
     var phone = matchMedia('(max-width: 700px)');

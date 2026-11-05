@@ -16,7 +16,7 @@
 <h2>Waiting for a letter</h2>
 
 {% if pending %}
-<div class="tablewrap" tabindex="0" role="region" aria-label="Students waiting for a letter, scrolls sideways">
+<div class="tablewrap" tabindex="0" role="region" aria-label="Students waiting for a letter">
   <table class="data">
     <thead>
       <tr><th>Student</th><th>Course evidence</th><th>Documents</th><th>Letter status</th><th>Record</th></tr>
@@ -29,7 +29,7 @@
           <div class="evidence-chips"><span class="tag yes">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct is not none else 'No grade' }}</span><span class="tag" title="{{ r.grade_source or '' }}">{{ {'database':'Course records','manual':'Entered grade','transcript':'Transcript'}.get(r.grade_source, r.grade_source or 'Unknown source') }}</span></div>
           <details class="enrolment-details"><summary>Enrolments</summary><p>{{ (r.eligible_identifiers or 'No enrolments') | replace(';', ' · ') }}</p></details>
         </td>
-        <td>{% if r.letter_file %}<a class="btn btn-ghost" href="{{ url_for('prof_download_letter', token=token, filename=r.letter_file) }}">Download letter</a>{% else %}<span class="muted">No letter file</span>{% endif %}</td>
+        <td class="document-cell">{% if r.letter_file %}<a class="btn btn-ghost document-link" href="{{ url_for('prof_download_letter', token=token, filename=r.letter_file) }}">Download letter</a>{% else %}<span class="muted">No letter file</span>{% endif %}</td>
         <td><form method="POST" action="{{ url_for('prof_toggle_done', token=token, student_number=r.student_number) }}">
             <button class="btn btn-primary" type="submit" aria-label="Mark the letter for {{ r.student_name }} as written">Mark written</button>
         </form></td>
@@ -53,7 +53,7 @@
 <section id="written" class="letter-folder">
 <h2>Letters written ({{ done | length }})</h2>
 {% if done %}
-  <div class="tablewrap" tabindex="0" role="region" aria-label="Letters already written, scrolls sideways" style="margin-top:var(--space-4)">
+  <div class="tablewrap" tabindex="0" role="region" aria-label="Letters already written" style="margin-top:var(--space-4)">
     <table class="data">
       <thead><tr><th>Student</th><th class="num">Grade</th><th>Letter status</th><th>Record</th></tr></thead>
       <tbody>
