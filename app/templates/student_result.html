@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ 'Eligible' if r.eligible else 'Not eligible yet' }} — {{ app_name }}{% endblock %}
-{% block main_class %} class="narrow"{% endblock %}
+{% block main_class %} class="student-page"{% endblock %}
 {% block content %}
 <div class="page-head">
-  <span class="eyebrow">{{ r.student_number }} · checked {{ checked_at }}</span>
+  <p class="result-context">Student {{ r.student_number }} · checked {{ checked_at }}</p>
   <h1 class="sr-only">Eligibility result</h1>
 </div>
 

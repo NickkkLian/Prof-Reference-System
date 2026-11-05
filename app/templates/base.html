@@ -11,22 +11,22 @@
 <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='design-tokens.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='letterkeep.css') }}">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="brand" href="{{ url_for('prof_dashboard', token=token) if token else url_for('student_home') }}" aria-label="{{ app_name }} home">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="14" y="14" width="4" height="4" rx="1" fill="var(--point)"/></svg>
-    <b>{{ app_name }}</b><span>{% block tagline %}Reference-letter eligibility for one course — the roster stays on the professor's machine.{% endblock %}</span>
+    <b>{{ app_name }}</b>
   </a>
-  {% if token %}<span class="pill" title="You are on the professor's side of the app; the address carries the token that opens it.">Professor<span class="long"> view</span></span>{% else %}<span class="spacer"></span>{% endif %}
-  <button class="btn btn-ghost btn-icon" id="theme" aria-label="Dark mode" aria-pressed="false" title="Dark mode"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  <p class="workspace-label">{{ 'Faculty workspace' if token else 'Reference letter request' }}</p>
+  <button class="btn btn-ghost btn-icon" id="theme" aria-label="Switch colour theme" aria-pressed="false" title="Switch colour theme"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.5A8 8 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg></button>
 </header>
 {% if token %}
+<details class="app-navigation" open>
+<summary>Professor pages</summary>
 <nav class="subnav" aria-label="Professor pages">
   <a href="{{ url_for('prof_dashboard', token=token) }}"{% if page == 'dashboard' %} aria-current="page"{% endif %}>Dashboard</a>
   <a href="{{ url_for('prof_check', token=token) }}"{% if page == 'check' %} aria-current="page"{% endif %}>Check a student</a>
@@ -37,6 +37,7 @@
   <a href="{{ url_for('prof_files', token=token) }}"{% if page == 'files' %} aria-current="page"{% endif %}>Roster files</a>
   <a href="{{ url_for('prof_settings', token=token) }}"{% if page == 'settings' %} aria-current="page"{% endif %}>Settings</a>
 </nav>
+</details>
 {% endif %}
 <main id="main" tabindex="-1"{% block main_class %}{% endblock %}>
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -46,7 +47,9 @@
 {% endwith %}
 {% block content %}{% endblock %}
 </main>
-<footer class="honest">
+<footer class="app-footer">
+  <p>Course records and files stay on this machine.</p>
+  <details><summary>About Letterkeep</summary>
   <dl class="inner">
     <div><dt>What this is</dt>
     <dd>{{ app_name }} answers one question for one course: does a student meet the professor's stated conditions for a reference letter — on the roster, grade at or above the threshold, attendance at or above it in every enrolment. It was built for a faculty client (name withheld); this repository is the v1 snapshot, and the version in use is maintained privately.</dd></div>
@@ -55,10 +58,18 @@
     <div><dt>Source</dt>
     <dd><a href="https://github.com/NickkkLian/Prof-Reference-System" rel="noopener">github.com/NickkkLian/Prof-Reference-System</a> · MIT · <code>python3 run_web.py --seed</code></dd></div>
   </dl>
+  </details>
 </footer>
 <script src="{{ url_for('static', filename='theme-control.js') }}"></script>
 <script>
   Appearance.bindToggle(document.getElementById('theme'));
+  var navigation = document.querySelector('.app-navigation');
+  if (navigation) {
+    var phone = matchMedia('(max-width: 700px)');
+    var syncNavigation = function () { navigation.open = !phone.matches; };
+    phone.addEventListener('change', syncNavigation);
+    syncNavigation();
+  }
   // A form with data-confirm asks before it submits. Names and file names go into that attribute, which the template
   // HTML-escapes and this reads back as text; they are never written into an inline handler.
   document.addEventListener('submit', function (e) {

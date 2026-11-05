@@ -6,32 +6,34 @@
 {% set done = rows | selectattr('reference_done', 'ne', 0) | list %}
 <div class="page-head">
   <h1>Eligible students</h1>
-  <p>{{ pending | length }} waiting for a letter · {{ done | length }} written. A student lands here when all three
-     conditions are met — either from their own submission or from a check you ran. Tick a student once you have
-     written their letter.</p>
+  <p>These students meet all three conditions. Mark a letter written when it is ready.</p>
 </div>
+<nav class="letter-folders" aria-label="Letter folders">
+  <a class="btn" href="#waiting">Waiting <span>{{ pending | length }}</span></a>
+  <a class="btn btn-ghost" href="#written">Written <span>{{ done | length }}</span></a>
+</nav>
+<section id="waiting" class="letter-folder">
+<h2>Waiting for a letter</h2>
 
 {% if pending %}
 <div class="tablewrap" tabindex="0" role="region" aria-label="Students waiting for a letter, scrolls sideways">
   <table class="data">
     <thead>
-      <tr><th>Written</th><th>Student #</th><th>Name</th><th class="num">Grade</th><th>Grade from</th>
-          <th>Enrolments</th><th>Letter</th><th>Checked</th><th>Remove</th></tr>
+      <tr><th>Student</th><th>Course evidence</th><th>Documents</th><th>Letter status</th><th>Record</th></tr>
     </thead>
     <tbody>
       {% for r in pending %}
       <tr>
+        <td class="student-cell"><strong>{{ r.student_name }}</strong><span>{{ r.student_number }}</span></td>
+        <td class="evidence-cell">
+          <div class="evidence-chips"><span class="tag yes">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct is not none else 'No grade' }}</span><span class="tag" title="{{ r.grade_source or '' }}">{{ {'database':'Course records','manual':'Entered grade','transcript':'Transcript'}.get(r.grade_source, r.grade_source or 'Unknown source') }}</span></div>
+          <details class="enrolment-details"><summary>Enrolments</summary><p>{{ (r.eligible_identifiers or 'No enrolments') | replace(';', ' · ') }}</p></details>
+        </td>
+        <td>{% if r.letter_file %}<a class="btn btn-ghost" href="{{ url_for('prof_download_letter', token=token, filename=r.letter_file) }}">Download letter</a>{% else %}<span class="muted">No letter file</span>{% endif %}</td>
         <td><form method="POST" action="{{ url_for('prof_toggle_done', token=token, student_number=r.student_number) }}">
-            <button class="btn btn-ghost btn-icon" type="submit" aria-label="Mark the letter for {{ r.student_name }} as written">☐</button>
+            <button class="btn btn-primary" type="submit" aria-label="Mark the letter for {{ r.student_name }} as written">Mark written</button>
         </form></td>
-        <td class="mono">{{ r.student_number }}</td>
-        <td>{{ r.student_name }}</td>
-        <td class="num">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct else '—' }}</td>
-        <td><span class="tag {{ 'no' if r.grade_source == 'manual' else '' }}">{{ r.grade_source or '—' }}</span></td>
-        <td class="mono" style="white-space:normal">{{ (r.eligible_identifiers or '—') | replace(';', ' · ') }}</td>
-        <td>{% if r.letter_file %}<a class="btn btn-ghost" href="{{ url_for('prof_download_letter', token=token, filename=r.letter_file) }}">Download</a>{% else %}—{% endif %}</td>
-        <td>{{ r.checked_at }}</td>
-        <td><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
+        <td class="record-cell"><span>{{ r.checked_at }}</span><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
                   data-confirm="Remove {{ r.student_name }} from the eligible list?">
             <button class="btn btn-danger" type="submit">Remove</button>
         </form></td>
@@ -46,24 +48,23 @@
   <p>{{ 'Nothing is waiting for you here.' if done else 'A student appears here as soon as they meet all three conditions.' }}</p>
 </div>
 {% endif %}
+</section>
 
+<section id="written" class="letter-folder">
+<h2>Letters written ({{ done | length }})</h2>
 {% if done %}
-<section>
-  <h2>Letters written ({{ done | length }})</h2>
   <div class="tablewrap" tabindex="0" role="region" aria-label="Letters already written, scrolls sideways" style="margin-top:var(--space-4)">
     <table class="data">
-      <thead><tr><th>Undo</th><th>Student #</th><th>Name</th><th class="num">Grade</th><th>Checked</th><th>Remove</th></tr></thead>
+      <thead><tr><th>Student</th><th class="num">Grade</th><th>Letter status</th><th>Record</th></tr></thead>
       <tbody>
         {% for r in done %}
         <tr>
+          <td class="student-cell"><strong>{{ r.student_name }}</strong><span>{{ r.student_number }}</span></td>
+          <td class="num">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct is not none else '—' }}</td>
           <td><form method="POST" action="{{ url_for('prof_toggle_done', token=token, student_number=r.student_number) }}">
-              <button class="btn btn-ghost btn-icon" type="submit" aria-label="Mark the letter for {{ r.student_name }} as not written yet">☑</button>
+              <button class="btn" type="submit" aria-label="Mark the letter for {{ r.student_name }} as not written yet">Move to waiting</button>
           </form></td>
-          <td class="mono">{{ r.student_number }}</td>
-          <td>{{ r.student_name }}</td>
-          <td class="num">{{ '%.1f' % r.overall_grade_pct ~ '%' if r.overall_grade_pct else '—' }}</td>
-          <td>{{ r.checked_at }}</td>
-          <td><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
+          <td class="record-cell"><span>{{ r.checked_at }}</span><form method="POST" action="{{ url_for('prof_delete_eligible', token=token, student_number=r.student_number) }}"
                     data-confirm="Remove {{ r.student_name }} from the list?">
               <button class="btn btn-danger" type="submit">Remove</button>
           </form></td>
@@ -72,6 +73,8 @@
       </tbody>
     </table>
   </div>
-</section>
+{% else %}
+<p class="folder-empty">No letters have been marked written.</p>
 {% endif %}
+</section>
 {% endblock %}

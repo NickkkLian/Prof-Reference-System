@@ -17,14 +17,16 @@
   <p>What the roster holds right now, and a quick check for a student who has written to you directly.</p>
 </div>
 
-<div class="tiles">
+<div class="dashboard-layout">
+<div class="dashboard-primary">
+<div class="tiles" aria-label="Roster totals">
   <div class="tile"><b class="num">{{ stats.total_enrolments }}</b><span>Enrolments</span></div>
   <div class="tile"><b class="num">{{ stats.unique_students }}</b><span>Students</span></div>
   <div class="tile"><b class="num">{{ stats.courses | length }}</b><span>Courses</span></div>
   <div class="tile"><b class="num">{{ eligible_count }}</b><span>Checked eligible</span></div>
 </div>
 
-<section class="grid two">
+<section>
   <form class="card" method="POST" action="{{ url_for('prof_dashboard', token=token) }}">
     <h2>Check a student</h2>
     <p>Answers the same three conditions the student page answers, from the roster you imported.</p>
@@ -47,22 +49,6 @@
     {% endif %}
   </form>
 
-  <div class="card">
-    <h2>Courses in the roster</h2>
-    {% if stats.courses %}
-      <p class="mono" style="margin-top:var(--space-3)">{{ stats.courses | join(' · ') }}</p>
-    {% else %}
-      <p>No courses yet — <a href="{{ url_for('prof_import', token=token) }}">import a roster file</a> to start.</p>
-    {% endif %}
-    <h3 style="margin-top:var(--space-6)">Storage</h3>
-    <p>{{ storage.total }} used of 512 MB ({{ storage.pct }}%).</p>
-    <ul class="facts">
-      <li><span>Database</span><b class="num">{{ storage.db }}</b></li>
-      <li><span>Transcripts</span><b class="num">{{ storage.transcripts }}</b></li>
-      <li><span>Letters</span><b class="num">{{ storage.letters }}</b></li>
-      <li><span>Roster files</span><b class="num">{{ storage.rosters }}</b></li>
-    </ul>
-  </div>
 </section>
 
 <section>
@@ -91,4 +77,22 @@
   </div>
   {% endif %}
 </section>
+</div>
+<aside class="card course-summary">
+  <h2>Courses in the roster</h2>
+  {% if stats.courses %}
+    <p class="course-list">{{ stats.courses | join(' · ') }}</p>
+  {% else %}
+    <p>No courses yet. <a href="{{ url_for('prof_import', token=token) }}">Import a roster file</a> to start.</p>
+  {% endif %}
+  <h3>Storage</h3>
+  <p>{{ storage.total }} used of 512 MB ({{ storage.pct }}%).</p>
+  <ul class="facts">
+    <li><span>Database</span><b class="num">{{ storage.db }}</b></li>
+    <li><span>Transcripts</span><b class="num">{{ storage.transcripts }}</b></li>
+    <li><span>Letters</span><b class="num">{{ storage.letters }}</b></li>
+    <li><span>Roster files</span><b class="num">{{ storage.rosters }}</b></li>
+  </ul>
+</aside>
+</div>
 {% endblock %}
