@@ -1,0 +1,5 @@
+/* Fluid layout unit, relative to a 1230px reference viewport. */
+:root { --suite-screen-unit: clamp(16px, calc(100vw * 16 / 1230), calc(16px * 1920 / 1230)); --suite-text-min: calc(var(--suite-screen-unit) * .75); }
+html[data-suite-scale="fluid"] { --suite-px: calc(var(--suite-screen-unit) / 16); font-size: var(--suite-screen-unit); }
+@media (min-width:1230px) { body { max-width:calc(1215 * var(--suite-px, 1px)); margin-inline:auto; } }
+.sr-only, .grading-note { width: 1px; height: 1px; }
