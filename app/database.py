@@ -8,13 +8,8 @@ The database is a single .db file stored in the data folder.
 import sqlite3
 import os
 from contextlib import contextmanager
-from datetime import datetime, timezone, timedelta
 from . import config
-
-def _vancouver_now_str() -> str:
-    """Return current Vancouver time as string for DB storage (PDT = UTC-7)."""
-    van_time = datetime.now(timezone.utc) + timedelta(hours=-7)
-    return van_time.strftime("%Y-%m-%d %H:%M")
+from .display import vancouver_time
 
 # ---------------------------------------------------------------------------
 # Connection
@@ -109,17 +104,19 @@ def upsert_enrolment(record: dict):
         ).fetchone()
 
         if existing is None:
+            # Supply local time explicitly, including on databases with legacy UTC defaults.
+            values = {**record, "updated_at": vancouver_time().strftime("%Y-%m-%d %H:%M")}
             con.execute("""
                 INSERT INTO enrolments (
                     identifier, course, section, year, term,
                     student_number, student_name, first_name, last_name,
-                    absence_rate_pct, attendance_rate_pct, grade, source_file
+                    absence_rate_pct, attendance_rate_pct, grade, source_file, updated_at
                 ) VALUES (
                     :identifier, :course, :section, :year, :term,
                     :student_number, :student_name, :first_name, :last_name,
-                    :absence_rate_pct, :attendance_rate_pct, :grade, :source_file
+                    :absence_rate_pct, :attendance_rate_pct, :grade, :source_file, :updated_at
                 )
-            """, record)
+            """, values)
         else:
             # Only fill in fields that are currently NULL
             updates = []
@@ -131,10 +128,11 @@ def upsert_enrolment(record: dict):
                     updates.append(f"{col} = ?")
                     params.append(record[col])
             if updates:
+                params.append(vancouver_time().strftime("%Y-%m-%d %H:%M"))
                 params.append(record["identifier"])
                 con.execute(
                     f"UPDATE enrolments SET {', '.join(updates)}, "
-                    f"updated_at = datetime('now') WHERE identifier = ?",
+                    f"updated_at = ? WHERE identifier = ?",
                     params
                 )
 
@@ -294,13 +292,14 @@ def upsert_eligible(student_number: str, student_name: str,
                     eligible_identifiers: list[str],
                     attendance_rates: dict[str, float | None],
                     transcript_file: str = "",
-                    letter_file: str = ""):
+                    letter_file: str = "",
+                    checked_at: str | None = None):
     att_str  = "; ".join(
         f"{iid}:{rate:.1f}%" for iid, rate in attendance_rates.items()
         if rate is not None
     )
     iids_str = "; ".join(eligible_identifiers)
-    now_van  = _vancouver_now_str()
+    now_van  = checked_at if checked_at is not None else vancouver_time().strftime("%Y-%m-%d %H:%M")
 
     with _conn() as con:
         con.execute("""
@@ -336,7 +335,7 @@ def toggle_reference_done(student_number: str) -> bool:
         if row is None:
             return False
         new_val = 0 if row[0] else 1
-        now     = _vancouver_now_str() if new_val else None
+        now     = vancouver_time().strftime("%Y-%m-%d %H:%M") if new_val else None
         con.execute(
             "UPDATE eligible_students SET reference_done=?, reference_done_at=? "
             "WHERE student_number=?",

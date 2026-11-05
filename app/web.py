@@ -5,29 +5,6 @@ Flask web application — student portal + professor dashboard
 
 import os, uuid
 from pathlib import Path
-from datetime import datetime, timezone, timedelta
-
-# Vancouver = Pacific Time (UTC-8 standard, UTC-7 daylight saving)
-# Use a simple offset approach — works without pytz
-import time as _time
-
-def _vancouver_now() -> datetime:
-    """Return current datetime in Vancouver (Pacific) time."""
-    # Check if daylight saving is active using local system — 
-    # or just calculate from UTC with proper DST offset
-    utc_now = datetime.now(timezone.utc)
-    # Pacific Standard Time = UTC-8, Pacific Daylight Time = UTC-7
-    # DST in effect second Sunday of March to first Sunday of November
-    year = utc_now.year
-    # Second Sunday of March
-    dst_start = datetime(year, 3, 8, 2, 0, tzinfo=timezone.utc)
-    dst_start += timedelta(days=(6 - dst_start.weekday()) % 7)
-    # First Sunday of November
-    dst_end = datetime(year, 11, 1, 2, 0, tzinfo=timezone.utc)
-    dst_end += timedelta(days=(6 - dst_end.weekday()) % 7)
-    offset = -7 if dst_start <= utc_now < dst_end else -8
-    return utc_now + timedelta(hours=offset)
-
 
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash, send_from_directory, abort, jsonify)
@@ -38,6 +15,7 @@ from . import config, database as db, eligibility as elig
 from .transcript_parser import extract_grade_from_pdf
 from .attendance_manager import import_file, import_all
 from .notifier import send_submission_notification, test_email
+from .display import format_file_size, vancouver_time
 
 # ── App setup ────────────────────────────────────────────────
 app = Flask(__name__)
@@ -176,6 +154,7 @@ def student_manual_grade():
 
 def _run_eligibility(sno, grade, grade_source, trans_fname, letter_fname, grade_note):
     """Shared logic — run check and render result."""
+    checked_at = vancouver_time().strftime("%Y-%m-%d %H:%M")
     result = elig.check(sno, grade, grade_source)
 
     if result["eligible"]:
@@ -188,6 +167,7 @@ def _run_eligibility(sno, grade, grade_source, trans_fname, letter_fname, grade_
             attendance_rates=result["att_results"],
             transcript_file=trans_fname,
             letter_file=letter_fname,
+            checked_at=checked_at,
         )
 
     # Send email notification regardless of eligibility
@@ -204,7 +184,7 @@ def _run_eligibility(sno, grade, grade_source, trans_fname, letter_fname, grade_
     return render_template("student_result.html",
                            r=result,
                            grade_note=grade_note,
-                           checked_at=_vancouver_now().strftime("%Y-%m-%d %H:%M"))
+                           checked_at=checked_at)
 
 
 # ════════════════════════════════════════════════════════════
@@ -256,17 +236,12 @@ def prof_dashboard(token):
     rosters_size     = _dir_size(config.ATTENDANCE_INPUT_DIR)
     total_size       = db_size + transcripts_size + letters_size + rosters_size
 
-    def _fmt(b):
-        if b < 1024:    return f"{b} B"
-        if b < 1024**2: return f"{b/1024:.1f} KB"
-        return              f"{b/1024**2:.1f} MB"
-
     storage = {
-        "db":          _fmt(db_size),
-        "transcripts": _fmt(transcripts_size),
-        "letters":     _fmt(letters_size),
-        "rosters":     _fmt(rosters_size),
-        "total":       _fmt(total_size),
+        "db":          format_file_size(db_size),
+        "transcripts": format_file_size(transcripts_size),
+        "letters":     format_file_size(letters_size),
+        "rosters":     format_file_size(rosters_size),
+        "total":       format_file_size(total_size),
         "total_mb":    round(total_size / 1024**2, 2),
         "limit_mb":    512,
         "pct":         round(total_size / (512 * 1024**2) * 100, 1),
@@ -320,9 +295,8 @@ def prof_documents(token):
                 fpath = os.path.join(directory, fname)
                 files.append({
                     "name":     fname,
-                    "size":     f"{os.path.getsize(fpath)/1024:.1f} KB",
-                    "modified": (datetime.fromtimestamp(os.path.getmtime(fpath), tz=timezone.utc)
-                                 + timedelta(hours=-7)).strftime("%Y-%m-%d %H:%M"),
+                    "size":     format_file_size(os.path.getsize(fpath)),
+                    "modified": vancouver_time(os.path.getmtime(fpath)).strftime("%Y-%m-%d %H:%M"),
                 })
         return files
 
@@ -420,9 +394,8 @@ def prof_files(token):
                 fpath = os.path.join(config.ATTENDANCE_INPUT_DIR, fname)
                 disk_files.append({
                     "name":     fname,
-                    "size":     f"{os.path.getsize(fpath)/1024:.1f} KB",
-                    "modified": (datetime.fromtimestamp(os.path.getmtime(fpath), tz=timezone.utc)
-                                 + timedelta(hours=-7)).strftime("%Y-%m-%d %H:%M"),
+                    "size":     format_file_size(os.path.getsize(fpath)),
+                    "modified": vancouver_time(os.path.getmtime(fpath)).strftime("%Y-%m-%d %H:%M"),
                 })
     db_files = {r["source_file"]: r for r in db.get_source_files()}
     return render_template("prof_files.html", token=token,

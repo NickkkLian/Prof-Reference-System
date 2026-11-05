@@ -98,7 +98,7 @@ required column is refused and the message names what is missing.
 
 ```bash
 python3 -m pip install -r requirements.txt pytest
-python3 -m pytest tests -q       # 41 tests
+python3 -m pytest tests -q       # 60 tests
 python3 break_check.py           # breaks the rule six ways; each must be caught
 ```
 
@@ -106,6 +106,9 @@ The tests cover the three places where a mistake would be silent: the rule itsel
 short of attendance, and a row with no attendance figure, which must not read as a pass), the roster parser (the
 three spellings above), and the notifier — with nothing configured it must send nothing, and the tests enforce that
 by turning any outgoing request into an error rather than an e-mail.
+
+Timestamp tests pin B.C.'s fixed UTC-7 across the former DST boundary, including result pages, saved records,
+file dates and roster imports. File-size tests keep bytes, KB and MB labels consistent across the professor's views.
 
 `break_check.py` breaks the rule in a copy of the code — attendance satisfied by one course, the grade threshold
 ignored, a missing figure counted as a pass, the roster aliases removed, the notifier's guard removed, every Python
@@ -162,7 +165,7 @@ run_web.py            server entry point
 run_desktop.py        desktop entry point (data folder beside the program)
 pyversion.py          the Python version both entry points check before importing anything
 break_check.py        breaks the rule six ways; each must be caught by its own test
-tests/                41 tests
+tests/                60 tests
 roster.spec           PyInstaller configuration for the desktop bundle
 ```
 
