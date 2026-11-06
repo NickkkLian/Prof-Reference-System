@@ -85,29 +85,33 @@ header { display: flex; align-items: center; gap: calc(24 * var(--suite-px, 1px)
 .documents, #notes-section { margin-top:0; }
 .documents details { margin-top:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); border-bottom:1px solid var(--line); font-size:calc(14 * var(--suite-px, 1px)); }
 .documents summary { font-weight:700; }
-#notes-section { padding:calc(12 * var(--suite-px, 1px)); min-width:0; }
+#notes-section { padding:calc(12 * var(--suite-px, 1px)); min-width:0; align-self:start; }
 .notes-heading { flex-wrap:wrap; gap:calc(4 * var(--suite-px, 1px)); }
-.notes-heading span { display:inline; }
 .prompt-chips { gap:calc(4 * var(--suite-px, 1px)); margin-block:calc(8 * var(--suite-px, 1px)); }
 #notes { min-height:calc(120 * var(--suite-px, 1px)); height:calc(120 * var(--suite-px, 1px)); }
 .record-actions { margin-top:calc(8 * var(--suite-px, 1px)); }
 .record-actions button { padding-inline:calc(10 * var(--suite-px, 1px)); font-size:calc(12 * var(--suite-px, 1px)); }
-.session-note { margin-top:calc(8 * var(--suite-px, 1px)); font-size:calc(12 * var(--suite-px, 1px)); color:var(--muted); }
-.case-intro { margin-top:calc(16 * var(--suite-px, 1px)); color:var(--muted); font-size:calc(14 * var(--suite-px, 1px)); max-width:66ch; }
+.session-note { display:none; margin-top:calc(8 * var(--suite-px, 1px)); font-size:calc(12 * var(--suite-px, 1px)); color:var(--muted); }
 #case-number { margin-top:calc(6 * var(--suite-px, 1px)); color:var(--muted); font-size:calc(14 * var(--suite-px, 1px)); }
 .rule-evidence { margin-top:calc(20 * var(--suite-px, 1px)); }
 .rule-evidence h2,#check-result h2 { font-size:calc(20 * var(--suite-px, 1px)); }
 #case-evidence { margin-block:calc(12 * var(--suite-px, 1px)); }
-#case-evidence > div { display:grid; grid-template-columns:calc(120 * var(--suite-px, 1px)) 1fr; gap:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); border-bottom:1px solid var(--line); font-size:calc(14 * var(--suite-px, 1px)); }
+#case-evidence,#case-enrolments { max-width:calc(544 * var(--suite-px, 1px)); }
+#case-evidence > div,#case-enrolments p { display:grid; grid-template-columns:calc(144 * var(--suite-px, 1px)) minmax(0,1fr) auto; justify-content:start; align-items:baseline; gap:calc(12 * var(--suite-px, 1px)); padding:calc(8 * var(--suite-px, 1px)) 0; border-bottom:1px solid var(--line); border-radius:0; font-size:calc(14 * var(--suite-px, 1px)); }
 #case-evidence dt { color:var(--muted); }
+#case-enrolments strong { font-weight:400; }
+.row-result { font-weight:700; color:var(--success); }
+#case-evidence .condition-fail,#case-enrolments .condition-fail { color:var(--warning); background:var(--warning-soft); }
+.condition-fail .row-result,.condition-fail dt { color:var(--warning); }
 .rule-evidence h3 { margin-top:calc(16 * var(--suite-px, 1px)); }
 .rule-evidence h3 small { display:block; font-weight:400; }
-#case-enrolments p { display:flex; justify-content:space-between; gap:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); font-size:calc(14 * var(--suite-px, 1px)); }
-.check-actions { display:flex; flex-wrap:wrap; gap:calc(8 * var(--suite-px, 1px)); margin-top:calc(16 * var(--suite-px, 1px)); }
-#check-result { margin-top:calc(16 * var(--suite-px, 1px)); padding:calc(12 * var(--suite-px, 1px)); background:var(--soft); }
-#check-result p { margin-top:calc(6 * var(--suite-px, 1px)); font-size:calc(14 * var(--suite-px, 1px)); }
-#check-result.passes { background:var(--success-soft); }
-#check-result.fails { background:var(--warning-soft); }
+.check-actions { display:flex; align-items:center; flex-wrap:wrap; gap:calc(12 * var(--suite-px, 1px)); margin-top:calc(20 * var(--suite-px, 1px)); }
+#check-result { margin:0; padding:0; background:transparent; border-radius:0; font-size:calc(14 * var(--suite-px, 1px)); }
+#check-result.passes { color:var(--success); }
+#check-result.fails { color:var(--warning); }
+#open-case-queue { margin-top:calc(12 * var(--suite-px, 1px)); }
+.record-actions { align-items:center; }
+.record-actions #record-status { margin:0; flex:1; min-width:calc(120 * var(--suite-px, 1px)); }
 @media(min-width:701px) { header { flex-wrap:wrap; gap:calc(12 * var(--suite-px, 1px)); } .local-copy { font-size:calc(11 * var(--suite-px, 1px)); } }
 @media(max-width:1000px) { .preparation-grid { grid-template-columns:1fr; } }
 @media(max-width:700px) {
@@ -121,8 +125,9 @@ header { display: flex; align-items: center; gap: calc(24 * var(--suite-px, 1px)
   .student-heading { flex-wrap:wrap; }
   .preparation-grid { display:block; }
   #notes-section { margin-top:16px; }
-  #case-evidence > div { grid-template-columns:90px 1fr; }
-  #case-enrolments p { flex-wrap:wrap; }
+  #case-evidence > div,#case-enrolments p { grid-template-columns:90px minmax(0,1fr) auto; gap:8px; }
+  .session-note { display:block; }
+  .check-actions { align-items:start; }
 }
 
 .eligibility-desk .student-row { white-space:normal; }

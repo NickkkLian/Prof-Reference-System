@@ -50,11 +50,6 @@ function render() {
   $('#mark-written').textContent=selected.written?'Move back to waiting':'Mark letter written';
   $('#record-status').textContent=selected.written?'Letter recorded as written.':'Letter waiting to be written.';
 }
-$('#start-notes').addEventListener('click',()=>{
-  $('#notes').focus();
-  ui.fade($('#notes-section'));
-  $('#record-status').textContent='Letter notes are open for this student.';
-});
 $('#notes').addEventListener('input',event=>{if(selected)selected.notes=event.target.value;});
 document.querySelectorAll('[data-prompt]').forEach(button=>button.addEventListener('click',()=>{
   if (!selected) return;
@@ -108,36 +103,57 @@ $('#check-view').addEventListener('click', () => showWorkspace(true));
 $('#queue-view').addEventListener('click', () => { showWorkspace(false); render(); });
 const sourceLabels = { database: 'Roster grade', transcript: 'Fictional transcript extraction', manual: 'Manual entry (no extracted PDF grade)' };
 let currentCase;
+function evidenceRow(label, value, passed, checked, tag = 'div') {
+  const row=document.createElement(tag);
+  row.className=checked ? (passed ? 'condition-pass' : 'condition-fail') : '';
+  const name=document.createElement(tag === 'div' ? 'dt' : 'span'); name.textContent=label;
+  const detail=document.createElement(tag === 'div' ? 'dd' : 'strong'); detail.textContent=value;
+  const state=document.createElement(tag === 'div' ? 'dd' : 'span'); state.className='row-result'; state.hidden=!checked;
+  state.textContent=passed?'✓':'×'; state.setAttribute('aria-label',passed?'Pass':'Fail');
+  row.append(name,detail,state);
+  return row;
+}
+function renderCaseEvidence(checked = false) {
+  const student=currentCase, result=LetterkeepEligibility.check(student);
+  $('#case-evidence').replaceChildren();
+  const grade=student.grade === null ? 'Missing' : student.grade + '%';
+  const values=[
+    ['Roster', student.enrolments.length ? student.enrolments.length + ' enrolment' + (student.enrolments.length > 1 ? 's' : '') + (checked?' · matched':'') : 'No roster match', result.inRoster],
+    ['Overall grade', grade + (checked ? (result.gradeOK?' · meets 80%':' · below 80%') : ' · 80% needed'), result.gradeOK],
+    ['Grade source', sourceLabels[student.grade_source] + (checked?' · recorded':''), student.grade !== null]
+  ];
+  for (const [label,value,passed] of values) $('#case-evidence').append(evidenceRow(label,value,passed,checked));
+  $('#case-enrolments').replaceChildren();
+  for (const enrolment of student.enrolments) {
+    const passed=enrolment.attendance !== null && enrolment.attendance >= 75;
+    const value=enrolment.attendance === null ? 'Attendance missing' : enrolment.attendance + '%' + (checked ? (passed?' · meets 75%':' · below 75%') : '');
+    const row=evidenceRow(enrolment.course.replace('DEMO','Course') + ' · section ' + enrolment.section, value, passed, checked, 'p');
+    $('#case-enrolments').append(row);
+  }
+  if (!student.enrolments.length) $('#case-enrolments').append(evidenceRow('Course records','No enrolments to check',false,checked,'p'));
+  return result;
+}
 function chooseCase(student) {
   currentCase = student;
   document.querySelectorAll('[data-case]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.case === student.id)));
   $('#case-name').textContent = student.name;
   $('#case-number').textContent = 'Student ' + student.number;
-  $('#case-evidence').replaceChildren();
-  for (const [label, value] of [['Roster', student.enrolments.length ? student.enrolments.length + ' matching enrolment' + (student.enrolments.length > 1 ? 's' : '') : 'No matching enrolments'], ['Overall grade', student.grade + '% · 80% required'], ['Grade source', sourceLabels[student.grade_source]]]) {
-    const row=document.createElement('div'); const dt=document.createElement('dt'); const dd=document.createElement('dd');
-    dt.textContent=label; dd.textContent=value; row.append(dt,dd); $('#case-evidence').append(row);
-  }
-  $('#case-enrolments').replaceChildren();
-  for (const enrolment of student.enrolments) {
-    const row=document.createElement('p');
-    const label=document.createElement('span'); label.textContent=enrolment.course.replace('DEMO','Course') + ' · section ' + enrolment.section;
-    const value=document.createElement('strong'); value.textContent=enrolment.attendance === null ? 'Attendance missing' : enrolment.attendance + '%';
-    row.append(label,value); $('#case-enrolments').append(row);
-  }
-  if (!student.enrolments.length) $('#case-enrolments').textContent='No course records to check.';
-  $('#check-result').replaceChildren();
-  const heading=document.createElement('h2'); heading.textContent='Ready to check';
-  const hint=document.createElement('p'); hint.textContent='Run the rule to see which conditions pass.';
-  $('#check-result').append(heading,hint); $('#check-result').className='';
+  renderCaseEvidence();
+  $('#check-result').textContent='Run the rule to see the result.';
+  $('#check-result').className='';
   $('#open-case-queue').hidden=true;
 }
 $('#run-check').addEventListener('click', () => {
-  const result=LetterkeepEligibility.check(currentCase);
-  $('#check-result').replaceChildren();
-  const heading=document.createElement('h2'); heading.textContent=result.eligible?'Eligible for a reference':'Not eligible yet';
-  const detail=document.createElement('p'); detail.textContent=[['Roster match',result.inRoster],['Grade',result.gradeOK],['Every enrolment’s attendance',result.attendanceOK]].map(([label,ok])=>label + ': ' + (ok?'passes':'does not pass')).join(' · ');
-  $('#check-result').append(heading,detail); $('#check-result').className=result.eligible?'passes':'fails';
+  const result=renderCaseEvidence(true);
+  let verdict='Eligible: all conditions met';
+  if (!result.inRoster) verdict='Not eligible: no roster match';
+  else if (!result.gradeOK) verdict='Not eligible: grade ' + (currentCase.grade === null ? 'missing' : currentCase.grade + '%') + ' (80% needed)';
+  else if (!result.attendanceOK) {
+    const enrolment=currentCase.enrolments.find(e=>e.attendance === null || e.attendance < 75);
+    verdict='Not eligible: ' + enrolment.course.replace('DEMO','Course') + ' attendance ' + (enrolment.attendance === null ? 'missing' : enrolment.attendance + '%') + ' (75% needed)';
+  }
+  $('#check-result').textContent=verdict;
+  $('#check-result').className=result.eligible?'passes':'fails';
   $('#open-case-queue').hidden=!result.eligible;
 });
 $('#open-case-queue').addEventListener('click', () => {
