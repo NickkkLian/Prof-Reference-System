@@ -1,0 +1,81 @@
+[
+  {
+    "id": "alice",
+    "name": "Alice Chen",
+    "number": "10001001",
+    "description": "Passing case \u00b7 roster grade",
+    "grade": 88.5,
+    "grade_source": "database",
+    "enrolments": [
+      {
+        "course": "DEMO 310",
+        "section": "101",
+        "attendance": 98
+      }
+    ],
+    "expected": true
+  },
+  {
+    "id": "one-course",
+    "name": "Taylor Reed",
+    "number": "10003001",
+    "description": "One course below attendance threshold",
+    "grade": 91,
+    "grade_source": "transcript",
+    "enrolments": [
+      {
+        "course": "DEMO 310",
+        "section": "101",
+        "attendance": 96
+      },
+      {
+        "course": "DEMO 320",
+        "section": "201",
+        "attendance": 60
+      }
+    ],
+    "expected": false
+  },
+  {
+    "id": "missing",
+    "name": "Jordan Lee",
+    "number": "10003002",
+    "description": "Missing attendance",
+    "grade": 91,
+    "grade_source": "manual",
+    "enrolments": [
+      {
+        "course": "DEMO 310",
+        "section": "101",
+        "attendance": null
+      }
+    ],
+    "expected": false
+  },
+  {
+    "id": "low-grade",
+    "name": "Robin Park",
+    "number": "10003003",
+    "description": "Grade below threshold",
+    "grade": 79.9,
+    "grade_source": "manual",
+    "enrolments": [
+      {
+        "course": "DEMO 310",
+        "section": "101",
+        "attendance": 90
+      }
+    ],
+    "expected": false
+  },
+  {
+    "id": "no-match",
+    "name": "Unlisted student",
+    "number": "99999999",
+    "description": "No roster match",
+    "grade": 95,
+    "grade_source": "manual",
+    "enrolments": [],
+    "expected": false
+  }
+]

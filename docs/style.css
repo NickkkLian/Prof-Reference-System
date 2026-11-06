@@ -66,3 +66,67 @@ header { display: flex; align-items: center; gap: calc(24 * var(--suite-px, 1px)
 .guide-shots img { width: 100%; height: auto; }
 .guide-shots figcaption { font-size: calc(12 * var(--suite-px, 1px)); color: var(--muted); margin-top: calc(8 * var(--suite-px, 1px)); }
 @media(max-width:700px) { .project-guide { padding: calc(24 * var(--suite-px, 1px)) calc(16 * var(--suite-px, 1px)); } .guide-shots { grid-template-columns: 1fr; } }
+
+
+/* Eligibility inputs and a compact letter preparation surface. */
+.workspace-nav { display:flex; gap:calc(4 * var(--suite-px, 1px)); }
+.workspace-nav button { background:transparent; font-weight:400; }
+.workspace-nav button[aria-current] { background:var(--selection); font-weight:700; }
+.desk { min-height:0; align-items:start; gap:calc(24 * var(--suite-px, 1px)); }
+.inbox-heading { padding:calc(12 * var(--suite-px, 1px)); }
+.inbox h2 { font-size:calc(20 * var(--suite-px, 1px)); }
+.student-row { min-height:0; padding:calc(12 * var(--suite-px, 1px)); margin-bottom:calc(4 * var(--suite-px, 1px)); }
+.student-record { padding:calc(24 * var(--suite-px, 1px)); }
+.metrics { gap:calc(12 * var(--suite-px, 1px)); margin-top:calc(16 * var(--suite-px, 1px)); }
+.metric { padding:calc(12 * var(--suite-px, 1px)); display:grid; grid-template-columns:1fr auto; column-gap:calc(12 * var(--suite-px, 1px)); align-items:center; }
+.metric strong { grid-column:2; grid-row:1/3; font-size:calc(24 * var(--suite-px, 1px)); margin:0; }
+.metric-track { grid-column:1/-1; margin-top:calc(8 * var(--suite-px, 1px)); }
+.preparation-grid { display:grid; grid-template-columns:.85fr 1.3fr; gap:calc(20 * var(--suite-px, 1px)); margin-top:calc(20 * var(--suite-px, 1px)); }
+.documents, #notes-section { margin-top:0; }
+.documents details { margin-top:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); border-bottom:1px solid var(--line); font-size:calc(14 * var(--suite-px, 1px)); }
+.documents summary { font-weight:700; }
+#notes-section { padding:calc(12 * var(--suite-px, 1px)); min-width:0; }
+.notes-heading { flex-wrap:wrap; gap:calc(4 * var(--suite-px, 1px)); }
+.notes-heading span { display:inline; }
+.prompt-chips { gap:calc(4 * var(--suite-px, 1px)); margin-block:calc(8 * var(--suite-px, 1px)); }
+#notes { min-height:calc(120 * var(--suite-px, 1px)); height:calc(120 * var(--suite-px, 1px)); }
+.record-actions { margin-top:calc(8 * var(--suite-px, 1px)); }
+.record-actions button { padding-inline:calc(10 * var(--suite-px, 1px)); font-size:calc(12 * var(--suite-px, 1px)); }
+.session-note { margin-top:calc(8 * var(--suite-px, 1px)); font-size:calc(12 * var(--suite-px, 1px)); color:var(--muted); }
+.case-intro { margin-top:calc(16 * var(--suite-px, 1px)); color:var(--muted); font-size:calc(14 * var(--suite-px, 1px)); max-width:66ch; }
+#case-number { margin-top:calc(6 * var(--suite-px, 1px)); color:var(--muted); font-size:calc(14 * var(--suite-px, 1px)); }
+.rule-evidence { margin-top:calc(20 * var(--suite-px, 1px)); }
+.rule-evidence h2,#check-result h2 { font-size:calc(20 * var(--suite-px, 1px)); }
+#case-evidence { margin-block:calc(12 * var(--suite-px, 1px)); }
+#case-evidence > div { display:grid; grid-template-columns:calc(120 * var(--suite-px, 1px)) 1fr; gap:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); border-bottom:1px solid var(--line); font-size:calc(14 * var(--suite-px, 1px)); }
+#case-evidence dt { color:var(--muted); }
+.rule-evidence h3 { margin-top:calc(16 * var(--suite-px, 1px)); }
+.rule-evidence h3 small { display:block; font-weight:400; }
+#case-enrolments p { display:flex; justify-content:space-between; gap:calc(12 * var(--suite-px, 1px)); padding-block:calc(8 * var(--suite-px, 1px)); font-size:calc(14 * var(--suite-px, 1px)); }
+.check-actions { display:flex; flex-wrap:wrap; gap:calc(8 * var(--suite-px, 1px)); margin-top:calc(16 * var(--suite-px, 1px)); }
+#check-result { margin-top:calc(16 * var(--suite-px, 1px)); padding:calc(12 * var(--suite-px, 1px)); background:var(--soft); }
+#check-result p { margin-top:calc(6 * var(--suite-px, 1px)); font-size:calc(14 * var(--suite-px, 1px)); }
+#check-result.passes { background:var(--success-soft); }
+#check-result.fails { background:var(--warning-soft); }
+@media(min-width:701px) { header { flex-wrap:wrap; gap:calc(12 * var(--suite-px, 1px)); } .local-copy { font-size:calc(11 * var(--suite-px, 1px)); } }
+@media(max-width:1000px) { .preparation-grid { grid-template-columns:1fr; } }
+@media(max-width:700px) {
+  header { flex-wrap:wrap; }
+  .workspace-nav { order:2; width:100%; }
+  .folders { order:3; }
+  .eligibility-desk { display:block; }
+  #case-list { display:flex; overflow:auto; gap:8px; padding-bottom:8px; }
+  #case-list .student-row { min-width:200px; flex:0 0 200px; }
+  .student-record { padding:20px 16px; }
+  .student-heading { flex-wrap:wrap; }
+  .preparation-grid { display:block; }
+  #notes-section { margin-top:16px; }
+  #case-evidence > div { grid-template-columns:90px 1fr; }
+  #case-enrolments p { flex-wrap:wrap; }
+}
+
+.eligibility-desk .student-row { white-space:normal; }
+@media(max-width:700px) {
+  .metric { display:block; }
+  .metric strong { margin-top:4px; }
+}
