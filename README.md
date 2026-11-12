@@ -1,27 +1,24 @@
 # Letterkeep
 
-![Letterkeep sample queue and letter notes](docs/screenshot-workspace.png)
-
 **Students check whether they qualify for a reference letter before they ask — the roster, the grades and the files never leave the professor's own machine.**
 
 Built for a faculty client (name withheld) who was spending each term's last weeks answering the same question by
-hand. This repository is the v1 snapshot, kept as a public sample; the version in use is maintained privately and is
-not reflected here.
+hand. A student uploads a transcript and a letter of interest and gets an answer on three conditions: on the roster,
+grade at or above the threshold, attendance at or above the threshold in every enrolment.
 
-[![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png)
+[![The student's answer: you qualify for a reference letter, and which of the three conditions are met](docs/screenshot-result.png)](docs/screenshot-result.png)
 
-**An interactive sample:** https://nickkklian.github.io/Prof-Reference-System/ — three fictional seed records, their course evidence and letter notes. Notes and written status last until reload. The expandable guide below the queue covers submissions, professor tools and setup. Run the full application on your own machine for your own roster, grades and files.
+**Try the interactive sample:** https://nickkklian.github.io/Prof-Reference-System/ — the professor's queue with three fictional students, their course evidence and letter notes. To use your own roster, grades and files, run it on your own machine:
+
+![Letterkeep sample queue and letter notes](docs/screenshot-workspace.png)
 
 ```bash
 python3 -m pip install -r requirements.txt
 python3 run_web.py --seed        # demo data, then http://127.0.0.1:5001
 ```
 
-Python 3.10 or newer. macOS ships 3.9 as `/usr/bin/python3`, which cannot run this — `run_web.py` says so and stops
-rather than failing inside an import.
-
-`--seed` writes fifteen made-up students across two courses, three of them already checked as eligible, and prints
-the professor's address — it is the student page plus a token, and the token is the only key to the professor's side.
+Python 3.10 or newer. `--seed` writes fifteen made-up students across two courses, three of them already checked as
+eligible, and prints the professor's private address (see [Running it](#running-it)).
 
 ---
 
@@ -41,8 +38,8 @@ but no name, enrolment or figure from the roster: anyone who knows a student num
 
 | | |
 |---|---|
-| ![The answer, and which of the three conditions are met](docs/screenshot-result.png) | ![The professor's dashboard: counts, a quick check, and who was checked recently](docs/screenshot-dashboard.png) |
-| The student's answer | The professor's dashboard |
+| [![The student page on a phone: the three conditions, then the upload form](docs/screenshot-student.png)](docs/screenshot-student.png) | ![The professor's dashboard: counts, a quick check, and who was checked recently](docs/screenshot-dashboard.png) |
+| The student page on a phone | The professor's dashboard |
 
 ```mermaid
 %%{init: {"theme": "base", "themeVariables": {"darkMode": false, "fontFamily": "Instrument Sans, sans-serif", "primaryColor": "#dce6f1", "mainBkg": "#dce6f1", "primaryTextColor": "#23364a", "nodeTextColor": "#23364a", "textColor": "#23364a", "primaryBorderColor": "#435f7c", "nodeBorder": "#435f7c", "secondaryColor": "#edf1f6", "tertiaryColor": "#e7edf4", "lineColor": "#435f7c", "arrowheadColor": "#435f7c", "defaultLinkColor": "#435f7c", "edgeLabelBackground": "#edf1f6", "clusterBkg": "#e7edf4", "clusterBorder": "#cdd7e3", "titleColor": "#435f7c"}}}%%
@@ -59,6 +56,9 @@ flowchart LR
 
 ## Running it
 
+In the online sample, notes and written status last until reload; the expandable guide below the queue covers
+submissions, professor tools and setup. To run it yourself:
+
 | Command | What it does |
 |---|---|
 | `python3 run_web.py --seed` | demo data, then serves on `127.0.0.1:5001` |
@@ -71,8 +71,12 @@ The default binding is **this machine only**. `--host 0.0.0.0` puts the roster o
 professor's address is reachable by anyone who has it — a deliberate choice, not the default. Port 5001 is the
 default because on macOS port 5000 belongs to AirPlay Receiver.
 
-**The professor's address is the credential.** It is `prof_token.txt` in the data folder, beside the database; delete that file and
+**The professor's address is the credential:** the student page plus a token, and the token is the only key to the
+professor's side. The token is `prof_token.txt` in the data folder, beside the database; delete that file and
 the next start mints a new one, which invalidates the old link.
+
+Python 3.10 or newer. macOS ships 3.9 as `/usr/bin/python3`, which cannot run this — `run_web.py` says so and stops
+rather than failing inside an import.
 
 ---
 
@@ -91,6 +95,20 @@ the student columns. Each column is matched against the spellings below, in any 
 
 An absence written as `0.04` and as `4` both mean four percent; attendance is 100 minus absence. A file missing a
 required column is refused and the message names what is missing.
+
+---
+
+## Where the data lives
+
+Everything is in the data folder beside the program (`data/`, or `app/data/` when you start it with `run_web.py`;
+`--data-dir` picks another): `professor_reference.db` (SQLite), `attendance_input/` (the roster files you import),
+`uploads/` (transcripts and letters), `prof_token.txt`, and the two settings files. Nothing is
+sent anywhere unless a notification address **and** a Brevo API key are configured in Settings; with either missing,
+the app sends nothing and says so.
+
+This handles student personal information, so where it runs matters: the desktop entry point keeps everything on one
+machine, and a server deployment should sit on infrastructure that satisfies the applicable privacy legislation
+(in British Columbia, FIPPA).
 
 ---
 
@@ -118,20 +136,6 @@ suite that reddens for an unrelated reason is reported as not caught.
 GitHub Actions runs the tests on Python 3.10 and 3.13, the break check, a 3.9 job that checks the app turns that
 version away with a sentence rather than a traceback, and a start-up job that seeds the demo data and fetches both
 pages.
-
----
-
-## Where the data lives
-
-Everything is in the data folder beside the program (`data/`, or `app/data/` when you start it with `run_web.py`;
-`--data-dir` picks another): `professor_reference.db` (SQLite), `attendance_input/` (the roster files you import),
-`uploads/` (transcripts and letters), `prof_token.txt`, and the two settings files. Nothing is
-sent anywhere unless a notification address **and** a Brevo API key are configured in Settings; with either missing,
-the app sends nothing and says so.
-
-This handles student personal information, so where it runs matters: the desktop entry point keeps everything on one
-machine, and a server deployment should sit on infrastructure that satisfies the applicable privacy legislation
-(in British Columbia, FIPPA).
 
 ---
 
@@ -169,9 +173,9 @@ tests/                60 tests
 roster.spec           PyInstaller configuration for the desktop bundle
 ```
 
-Until 2026-09-17 the same eight modules and eleven templates were in the repository twice, as `web-app/` and
-`desktop-app/`, byte for byte identical apart from the launcher and the packaging spec.
-
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
+
+This repository is the v1 snapshot, kept as a public sample; the version in use is maintained privately
+and is not reflected here.
