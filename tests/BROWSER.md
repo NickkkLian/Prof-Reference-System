@@ -4,7 +4,7 @@ The Python suite also uses Node 22+ to compare the public cases with the real
 Python eligibility rule. CI installs Node for that parity check.
 
 `check-ui.mjs` uses Node 22+ and an already running headless Chrome with its
-debugging endpoint on `127.0.0.1:9333`. Use an approved temporary Chrome profile.
+debugging endpoint on `127.0.0.1:9333`. Use a temporary Chrome profile.
 The harness creates an isolated browser context, blocks non-loopback page
 requests, and closes its context when finished.
 
@@ -15,5 +15,5 @@ node tests/check-ui.mjs http://127.0.0.1:8765/
 ```
 
 `BROWSER_URL` can select a different loopback debugging endpoint. The checks
-cover the reviewed interactions and the 1230×690, 1920×1080 and 390×844 layouts.
+cover the sample's interactions and the 1230×690, 1920×1080 and 390×844 layouts.
 They neither publish nor call a live model provider.

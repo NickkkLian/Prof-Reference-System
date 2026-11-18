@@ -24,8 +24,7 @@ eligible, and prints the professor's private address (see [Running it](#running-
 
 ## What it does
 
-A professor sets two thresholds. A student uploads their transcript and a letter of interest and gets an answer to
-three conditions, all read from the roster the professor imported:
+A professor sets two thresholds. The three conditions are all read from the roster the professor imported:
 
 1. **on the roster** — the student number appears in an imported roster file;
 2. **grade** — their overall grade is at or above the grade threshold (default 80%);
@@ -68,14 +67,14 @@ submissions, professor tools and setup. To run it yourself:
 | `gunicorn -w 4 -b 127.0.0.1:8000 app.web:app` | behind a real server — `gunicorn` is not in `requirements.txt`, install it separately |
 
 The default binding is **this machine only**. `--host 0.0.0.0` puts the roster on the local network, where the
-professor's address is reachable by anyone who has it — a deliberate choice, not the default. Port 5001 is the
+professor's address is reachable by anyone who has it. Port 5001 is the
 default because on macOS port 5000 belongs to AirPlay Receiver.
 
 **The professor's address is the credential:** the student page plus a token, and the token is the only key to the
 professor's side. The token is `prof_token.txt` in the data folder, beside the database; delete that file and
 the next start mints a new one, which invalidates the old link.
 
-Python 3.10 or newer. macOS ships 3.9 as `/usr/bin/python3`, which cannot run this — `run_web.py` says so and stops
+macOS ships Python 3.9 as `/usr/bin/python3`, which cannot run this — `run_web.py` says so and stops
 rather than failing inside an import.
 
 ---
